@@ -1,0 +1,39 @@
+@CardLedger_HostAddress = http://localhost:5244
+
+### Importar fatura CSV do Nubank
+POST {{CardLedger_HostAddress}}/api/invoice/import?source=nubank
+Content-Type: multipart/form-data
+
+file=@nubank_fatura.csv
+
+###
+
+### Listar todas as faturas (agrupadas por mês)
+GET {{CardLedger_HostAddress}}/api/invoice
+Accept: application/json
+
+###
+
+### Fatura de um mês específico
+GET {{CardLedger_HostAddress}}/api/invoice/2026/4
+Accept: application/json
+
+###
+
+### Resumo por categoria
+GET {{CardLedger_HostAddress}}/api/invoice/2026/4/summary
+Accept: application/json
+
+###
+
+### Filtrar transações
+GET {{CardLedger_HostAddress}}/api/transaction?year=2026&month=4
+Accept: application/json
+
+###
+
+### Atualizar categoria de transação
+PATCH {{CardLedger_HostAddress}}/api/transaction/1/category
+Content-Type: application/json
+
+"Alimentação"

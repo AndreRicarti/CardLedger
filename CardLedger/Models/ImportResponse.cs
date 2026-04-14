@@ -1,8 +1,7 @@
-namespace CardLedger.Models
+namespace CardLedger.Models;
+
+public sealed class ImportResponse
 {
-    public sealed class ImportResponse
-    {
-        public int Imported { get; set; }
-        public List<string> Months { get; set; } = new();
-    }
+    public int Imported { get; set; }
+    public List<string> Months { get; set; } = new();
 }

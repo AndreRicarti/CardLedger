@@ -13,7 +13,7 @@ namespace CardLedger.Services
         Task<int> ImportTransactionsAsync(List<Transaction> transactions);
     }
 
-    public class InvoiceService : IInvoiceService
+    public sealed class InvoiceService : IInvoiceService
     {
         private readonly InvoiceDbContext _context;
 

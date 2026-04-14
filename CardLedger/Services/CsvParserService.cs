@@ -8,7 +8,7 @@ namespace CardLedger.Services
         Task<List<Transaction>> ParseNubankCsvAsync(Stream fileStream);
     }
 
-    public class CsvParserService : ICsvParserService
+    public sealed class CsvParserService : ICsvParserService
     {
         private readonly Dictionary<string, string> _categoryRules;
 

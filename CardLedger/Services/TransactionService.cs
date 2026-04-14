@@ -11,7 +11,7 @@ namespace CardLedger.Services
         Task<bool> UpdateCategoryAsync(int id, string category);
     }
 
-    public class TransactionService : ITransactionService
+    public sealed class TransactionService : ITransactionService
     {
         private readonly InvoiceDbContext _context;
 

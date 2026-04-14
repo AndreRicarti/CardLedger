@@ -1,6 +1,6 @@
 namespace CardLedger.Models
 {
-    public class Transaction
+    public sealed class Transaction
     {
         public int Id { get; set; }
         public DateOnly Date { get; set; }

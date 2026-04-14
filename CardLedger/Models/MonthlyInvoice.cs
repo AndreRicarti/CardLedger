@@ -1,6 +1,6 @@
 namespace CardLedger.Models
 {
-    public class MonthlyInvoice
+    public sealed class MonthlyInvoice
     {
         public int Year { get; set; }
         public int Month { get; set; }

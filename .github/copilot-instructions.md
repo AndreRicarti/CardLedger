@@ -1,6 +1,14 @@
-# Copilot Instructions
+﻿# Copilot Instructions
 
 ## Project Guidelines
-- Quando trabalhando no projeto CardLedger, sempre ler e considerar o arquivo AGENTS.md como referência de arquitetura. 
-Este arquivo define os 3 agentes (CsvParserService, InvoiceService, TransactionService), modelos de dados, fluxos e endpoints da API. 
-Usar este documento como guia para sugerir mudanças arquiteturais, novas features e validações.
+
+### Arquitetura
+Quando trabalhando no projeto CardLedger:
+- Sempre consultar AGENTS.md como referência de arquitetura
+- Define os 3 agentes: CsvParserService, InvoiceService, TransactionService
+- Use como guia para mudanças arquiteturais, novas features e validações
+
+### Padrões de Código
+- **OBRIGATÓRIO:** Classes não herdadas usam sealed
+- Exceções: Controllers, DbContext, classes abstratas e especializadas
+- Ver CODING_STANDARDS.md para detalhes completos

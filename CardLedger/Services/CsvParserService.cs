@@ -27,6 +27,7 @@ public sealed class CsvParserService : ICsvParserService
             var header = await reader.ReadLineAsync();
 
             string? line;
+
             while ((line = await reader.ReadLineAsync()) != null)
             {
                 if (string.IsNullOrWhiteSpace(line))

@@ -8,9 +8,7 @@ namespace CardLedger.Services;
 public interface IInvoiceService
 {
     Task<List<MonthlyInvoice>> GetAllInvoicesAsync();
-    Task<MonthlyInvoice?> GetMonthlyInvoiceAsync(int year, int month);
     Task<MonthlyInvoice?> GetInvoiceByKeyAsync(string invoiceKey);
-    Task<MonthlySummary> GetMonthlySummaryAsync(int year, int month);
     Task<MonthlySummary> GetMonthlySummaryByKeyAsync(string invoiceKey);
     Task<int> ImportTransactionsAsync(List<Transaction> transactions);
 }
@@ -57,30 +55,6 @@ public sealed class InvoiceService : IInvoiceService
         };
     }
 
-    public async Task<MonthlyInvoice?> GetMonthlyInvoiceAsync(int year, int month)
-    {
-        var transactions = await _context.Transactions
-            .Where(t => t.Year == year && t.Month == month)
-            .ToListAsync();
-
-        if (!transactions.Any())
-            return null;
-
-        var invoiceKey = transactions.FirstOrDefault()?.InvoiceKey ?? $"{year}-{month:D2}";
-
-        return new MonthlyInvoice
-        {
-            Year = year,
-            Month = month,
-            InvoiceKey = invoiceKey,
-            MonthName = GetMonthName(year, month),
-            TotalSpent = transactions.Where(t => !t.IsRefund).Sum(t => t.Amount),
-            TotalRefunds = transactions.Where(t => t.IsRefund).Sum(t => t.Amount),
-            NetTotal = transactions.Where(t => !t.IsRefund).Sum(t => t.Amount) - transactions.Where(t => t.IsRefund).Sum(t => t.Amount),
-            TransactionCount = transactions.Count
-        };
-    }
-
     public async Task<MonthlyInvoice?> GetInvoiceByKeyAsync(string invoiceKey)
     {
         var transactions = await _context.Transactions
@@ -104,32 +78,6 @@ public sealed class InvoiceService : IInvoiceService
             TotalRefunds = transactions.Where(t => t.IsRefund).Sum(t => t.Amount),
             NetTotal = transactions.Where(t => !t.IsRefund).Sum(t => t.Amount) - transactions.Where(t => t.IsRefund).Sum(t => t.Amount),
             TransactionCount = transactions.Count()
-        };
-    }
-
-    public async Task<MonthlySummary> GetMonthlySummaryAsync(int year, int month)
-    {
-        var transactions = await _context.Transactions
-            .Where(t => t.Year == year && t.Month == month && !t.IsRefund)
-            .ToListAsync();
-
-        var total = transactions.Sum(t => t.Amount);
-
-        var byCategory = transactions
-            .GroupBy(t => t.Category)
-            .Select(g => new CategorySummary
-            {
-                Category = g.Key,
-                Amount = g.Sum(t => t.Amount),
-                Percentage = total > 0 ? decimal.Round((g.Sum(t => t.Amount) / total) * 100, 1) : 0
-            })
-            .OrderByDescending(c => c.Amount)
-            .ToList();
-
-        return new MonthlySummary
-        {
-            Total = total,
-            ByCategory = byCategory
         };
     }
 

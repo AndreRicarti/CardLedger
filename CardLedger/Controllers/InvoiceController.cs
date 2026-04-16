@@ -21,17 +21,20 @@ namespace CardLedger.Controllers
         /// Importar fatura CSV do Nubank
         /// </summary>
         [HttpPost("import")]
-        public async Task<ActionResult<ImportResponse>> ImportInvoice([FromQuery] string source = "nubank", IFormFile? file = null)
+        public async Task<ActionResult<ImportResponse>> ImportInvoice(
+            [FromQuery] string source = "nubank",
+            IFormFile? file = null)
         {
             if (file == null || file.Length == 0)
                 return BadRequest(new { message = "Arquivo não fornecido" });
 
-            if (source.ToLower() != "nubank")
+            if (!source.Equals("nubank", StringComparison.CurrentCultureIgnoreCase))
                 return BadRequest(new { message = "Apenas Nubank é suportado no momento" });
 
             try
             {
                 using var stream = file.OpenReadStream();
+
                 var transactions = await _csvParserService.ParseNubankCsvAsync(stream, file.FileName);
 
                 var imported = await _invoiceService.ImportTransactionsAsync(transactions);
@@ -66,7 +69,9 @@ namespace CardLedger.Controllers
         [HttpGet("{year}/{month}")]
         public async Task<ActionResult<MonthlyInvoice>> GetMonthlyInvoice(int year, int month)
         {
-            var invoice = await _invoiceService.GetMonthlyInvoiceAsync(year, month);
+            // Converter year/month para InvoiceKey e usar busca por chave
+            var invoiceKey = $"{year}-{month:D2}";
+            var invoice = await _invoiceService.GetInvoiceByKeyAsync(invoiceKey);
             if (invoice == null)
                 return NotFound(new { message = "Nenhuma fatura encontrada para este mês" });
 
@@ -79,7 +84,9 @@ namespace CardLedger.Controllers
         [HttpGet("{year}/{month}/summary")]
         public async Task<ActionResult<MonthlySummary>> GetMonthlySummary(int year, int month)
         {
-            var summary = await _invoiceService.GetMonthlySummaryAsync(year, month);
+            // Converter year/month para InvoiceKey e usar busca por chave
+            var invoiceKey = $"{year}-{month:D2}";
+            var summary = await _invoiceService.GetMonthlySummaryByKeyAsync(invoiceKey);
             return Ok(summary);
         }
 

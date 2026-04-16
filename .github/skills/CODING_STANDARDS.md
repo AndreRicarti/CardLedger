@@ -33,5 +33,40 @@ public class Transaction { }  // Falta sealed
 
 ---
 
+## 📦 File Scoped Namespace (Obrigatório)
+
+Todos os arquivos DEVEM usar **file scoped namespace** (C# 11+).
+
+### ✅ Correto
+```csharp
+namespace CardLedger.Models;
+
+public sealed class Transaction
+{
+    public int Id { get; set; }
+    // propriedades...
+}
+```
+
+### ❌ Errado
+```csharp
+namespace CardLedger.Models
+{
+    public sealed class Transaction
+    {
+        public int Id { get; set; }
+        // propriedades...
+    }
+}
+```
+
+### Por quê?
+- **Concisão:** Menos indentação
+- **Legibilidade:** Código mais limpo
+- **Moderno:** Padrão C# 11+
+- **Consistência:** Uma classe por arquivo
+
+---
+
 Para mais contexto arquitetural, consulte `AGENTS.md`.
 

@@ -10,5 +10,5 @@ Quando trabalhando no projeto CardLedger:
 
 ### Padrões de Código
 - **OBRIGATÓRIO:** Classes não herdadas usam sealed
-- Exceções: Controllers, DbContext, classes abstratas e especializadas
+- **OBRIGATÓRIO:** Usar file scoped namespace em todos os arquivos
 - Ver CODING_STANDARDS.md para detalhes completos

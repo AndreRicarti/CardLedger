@@ -20,6 +20,9 @@ public class InvoiceDbContext : DbContext
             .HasIndex(t => new { t.Year, t.Month });
 
         modelBuilder.Entity<Transaction>()
+            .HasIndex(t => t.InvoiceKey);
+
+        modelBuilder.Entity<Transaction>()
             .HasIndex(t => t.Category);
 
         modelBuilder.Entity<Transaction>()

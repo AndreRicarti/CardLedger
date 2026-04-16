@@ -5,7 +5,7 @@ namespace CardLedger.Services;
 
 public interface ICsvParserService
 {
-    Task<List<Transaction>> ParseNubankCsvAsync(Stream fileStream);
+    Task<List<Transaction>> ParseNubankCsvAsync(Stream fileStream, string fileName = "");
 }
 
 public sealed class CsvParserService : ICsvParserService
@@ -17,8 +17,9 @@ public sealed class CsvParserService : ICsvParserService
         _categoryRules = InitializeCategoryRules();
     }
 
-    public async Task<List<Transaction>> ParseNubankCsvAsync(Stream fileStream)
+    public async Task<List<Transaction>> ParseNubankCsvAsync(Stream fileStream, string fileName = "")
     {
+        var invoiceKey = ExtractInvoiceKeyFromFileName(fileName);
         var transactions = new List<Transaction>();
 
         using (var reader = new StreamReader(fileStream))
@@ -53,6 +54,7 @@ public sealed class CsvParserService : ICsvParserService
                         Source = "nubank",
                         Year = date.Year,
                         Month = date.Month,
+                        InvoiceKey = invoiceKey,
                         IsRefund = isRefund
                     });
                 }
@@ -60,6 +62,30 @@ public sealed class CsvParserService : ICsvParserService
         }
 
         return transactions;
+    }
+
+    private string ExtractInvoiceKeyFromFileName(string fileName)
+    {
+        if (string.IsNullOrWhiteSpace(fileName))
+            return string.Empty;
+
+        // Padrão esperado: Nubank_YYYY-MM-DD.csv
+        // Extrai a data de vencimento da fatura
+        var datePattern = @"(\d{4})-(\d{2})-(\d{2})";
+        var match = System.Text.RegularExpressions.Regex.Match(fileName, datePattern);
+
+        if (match.Success && int.TryParse(match.Groups[1].Value, out var year) &&
+            int.TryParse(match.Groups[2].Value, out var month) &&
+            int.TryParse(match.Groups[3].Value, out var day))
+        {
+            // A fatura refere-se ao mês anterior à data de vencimento
+            var closingDate = new DateOnly(year, month, day);
+            var invoiceDate = closingDate.AddMonths(-1);
+
+            return $"{invoiceDate.Year}-{invoiceDate.Month:D2}";
+        }
+
+        return string.Empty;
     }
 
     private List<string> ParseCsvLine(string line)
@@ -131,7 +157,6 @@ public sealed class CsvParserService : ICsvParserService
                     { "youtube", "Assinatura" },
                     { "netflix", "Assinatura" },
                     { "spotify", "Assinatura" },
-                    { "amazon", "Assinatura" },
                     { "prime", "Assinatura" },
                     { "premium", "Assinatura" },
                     { "subscription", "Assinatura" },
@@ -158,12 +183,12 @@ public sealed class CsvParserService : ICsvParserService
                     { "universidade", "Educação" },
                     { "faculdade", "Educação" },
 
-                                // Utilidades
-                                { "energia", "Utilidades" },
-                                { "água", "Utilidades" },
-                                { "internet", "Utilidades" },
-                                { "telefone", "Utilidades" },
-                                { "conta", "Utilidades" },
+                    // Utilidades
+                    { "energia", "Utilidades" },
+                    { "água", "Utilidades" },
+                    { "internet", "Utilidades" },
+                    { "telefone", "Utilidades" },
+                    { "conta", "Utilidades" },
                             };
                         }
                     }

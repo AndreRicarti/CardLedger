@@ -54,16 +54,6 @@ namespace CardLedger.Controllers
         }
 
         /// <summary>
-        /// Listar todas as faturas (agrupadas por mês)
-        /// </summary>
-        [HttpGet]
-        public async Task<ActionResult<List<MonthlyInvoice>>> GetAllInvoices()
-        {
-            var invoices = await _invoiceService.GetAllInvoicesAsync();
-            return Ok(invoices);
-        }
-
-        /// <summary>
         /// Fatura de um mês específico
         /// </summary>
         [HttpGet("{year}/{month}")]
@@ -76,41 +66,6 @@ namespace CardLedger.Controllers
                 return NotFound(new { message = "Nenhuma fatura encontrada para este mês" });
 
             return Ok(invoice);
-        }
-
-        /// <summary>
-        /// Resumo por categoria de um mês específico
-        /// </summary>
-        [HttpGet("{year}/{month}/summary")]
-        public async Task<ActionResult<MonthlySummary>> GetMonthlySummary(int year, int month)
-        {
-            // Converter year/month para InvoiceKey e usar busca por chave
-            var invoiceKey = $"{year}-{month:D2}";
-            var summary = await _invoiceService.GetMonthlySummaryByKeyAsync(invoiceKey);
-            return Ok(summary);
-        }
-
-        /// <summary>
-        /// Fatura por chave (formato: YYYY-MM, ex: 2026-03)
-        /// </summary>
-        [HttpGet("key/{invoiceKey}")]
-        public async Task<ActionResult<MonthlyInvoice>> GetInvoiceByKey(string invoiceKey)
-        {
-            var invoice = await _invoiceService.GetInvoiceByKeyAsync(invoiceKey);
-            if (invoice == null)
-                return NotFound(new { message = "Nenhuma fatura encontrada para esta chave" });
-
-            return Ok(invoice);
-        }
-
-        /// <summary>
-        /// Resumo por categoria de uma fatura específica (por chave)
-        /// </summary>
-        [HttpGet("key/{invoiceKey}/summary")]
-        public async Task<ActionResult<MonthlySummary>> GetMonthlySummaryByKey(string invoiceKey)
-        {
-            var summary = await _invoiceService.GetMonthlySummaryByKeyAsync(invoiceKey);
-            return Ok(summary);
         }
     }
 }

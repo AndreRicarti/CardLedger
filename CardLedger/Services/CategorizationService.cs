@@ -24,6 +24,11 @@ public sealed class CategorizationService : ICategorizationService
 
         title = title.ToLower().Trim();
 
+        // 0. Busca por parcelas (PRIMEIRA PRIORIDADE)
+        var parcelaMatch = SearchParcelaPattern(title);
+        if (!string.IsNullOrEmpty(parcelaMatch))
+            return parcelaMatch;
+
         // 1. Busca por correspondência exata com keywords
         var exactMatch = SearchExactMatch(title);
         if (!string.IsNullOrEmpty(exactMatch))
@@ -45,6 +50,17 @@ public sealed class CategorizationService : ICategorizationService
             return patternMatch;
 
         return "Não Categorizado";
+    }
+
+    private string? SearchParcelaPattern(string title)
+    {
+        // Detecta padrão de parcela: "Parcela X/Y" ou "parcela X/Y"
+        // Exemplo: "KaBuM! - NuPay - Parcela 1/5" → "Parcelado"
+        var parcelaPattern = @"[Pp]arcela\s+\d+\s*/\s*\d+";
+        if (System.Text.RegularExpressions.Regex.IsMatch(title, parcelaPattern))
+            return "Parcelado";
+
+        return null;
     }
 
     private string? SearchExactMatch(string title)

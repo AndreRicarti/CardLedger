@@ -54,6 +54,19 @@ namespace CardLedger.Controllers
         }
 
         /// <summary>
+        /// Summary da fatura por InvoiceKey com breakdown por categoria
+        /// </summary>
+        [HttpGet("key/{invoiceKey}/summary")]
+        public async Task<ActionResult<InvoiceSummary>> GetInvoiceSummary(string invoiceKey)
+        {
+            var summary = await _invoiceService.GetInvoiceSummaryByKeyAsync(invoiceKey);
+            if (summary == null)
+                return NotFound(new { message = "Nenhuma fatura encontrada para esta chave" });
+
+            return Ok(summary);
+        }
+
+        /// <summary>
         /// Fatura de um mês específico
         /// </summary>
         [HttpGet("{year}/{month}")]

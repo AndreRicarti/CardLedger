@@ -14,6 +14,7 @@ builder.Services.AddDbContext<InvoiceDbContext>(options =>
     options.UseSqlite("Data Source=invoices.db"));
 
 // Registrar serviços
+builder.Services.AddScoped<ICategorizationService, CategorizationService>();
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<ICsvParserService, CsvParserService>();

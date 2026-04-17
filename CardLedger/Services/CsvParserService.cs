@@ -10,16 +10,19 @@ public interface ICsvParserService
 
 public sealed class CsvParserService : ICsvParserService
 {
-    private readonly Dictionary<string, string> _categoryRules;
+    private readonly ICategorizationService _categorizationService;
 
-    public CsvParserService()
+    public CsvParserService(ICategorizationService categorizationService)
     {
-        _categoryRules = InitializeCategoryRules();
+        _categorizationService = categorizationService;
     }
 
-    public async Task<List<Transaction>> ParseNubankCsvAsync(Stream fileStream, string fileName = "")
+    public async Task<List<Transaction>> ParseNubankCsvAsync(
+        Stream fileStream,
+        string fileName = "")
     {
         var invoiceKey = ExtractInvoiceKeyFromFileName(fileName);
+
         var transactions = new List<Transaction>();
 
         using (var reader = new StreamReader(fileStream))
@@ -43,7 +46,7 @@ public sealed class CsvParserService : ICsvParserService
                 {
                     var title = parts[1];
                     var isRefund = amount < 0;
-                    var category = CategorizeTransaction(title);
+                    var category = _categorizationService.CategorizeTransaction(title);
 
                     transactions.Add(new Transaction
                     {
@@ -114,81 +117,4 @@ public sealed class CsvParserService : ICsvParserService
         result.Add(current.Trim('"').Trim());
         return result;
     }
-
-    private string CategorizeTransaction(string title)
-    {
-        title = title.ToLower();
-
-        foreach (var rule in _categoryRules)
-        {
-            if (title.Contains(rule.Key, StringComparison.OrdinalIgnoreCase))
-            {
-                return rule.Value;
-            }
-        }
-
-        return "Não Categorizado";
-    }
-
-    private Dictionary<string, string> InitializeCategoryRules()
-    {
-        return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-                {
-                    // Alimentação
-                    { "restaurante", "Alimentação" },
-                    { "pizzaria", "Alimentação" },
-                    { "hamburgueria", "Alimentação" },
-                    { "supermercado", "Alimentação" },
-                    { "padaria", "Alimentação" },
-                    { "mercado", "Alimentação" },
-                    { "açougue", "Alimentação" },
-                    { "cafe", "Alimentação" },
-
-                    // Transporte
-                    { "uber", "Transporte" },
-                    { "99", "Transporte" },
-                    { "taxi", "Transporte" },
-                    { "passagem", "Transporte" },
-                    { "combustível", "Transporte" },
-                    { "gasolina", "Transporte" },
-                    { "estacionamento", "Transporte" },
-
-                    // Assinatura
-                    { "youtube", "Assinatura" },
-                    { "netflix", "Assinatura" },
-                    { "spotify", "Assinatura" },
-                    { "prime", "Assinatura" },
-                    { "premium", "Assinatura" },
-                    { "subscription", "Assinatura" },
-
-                    // Compras Online
-                    { "shopee", "Compras Online" },
-                    { "amazon", "Compras Online" },
-                    { "aliexpress", "Compras Online" },
-                    { "mercado livre", "Compras Online" },
-                    { "ebay", "Compras Online" },
-                    { "wish", "Compras Online" },
-
-                    // Saúde
-                    { "farmácia", "Saúde" },
-                    { "hospital", "Saúde" },
-                    { "clínica", "Saúde" },
-                    { "médico", "Saúde" },
-                    { "odontológo", "Saúde" },
-
-                    // Educação
-                    { "udemy", "Educação" },
-                    { "coursera", "Educação" },
-                    { "escola", "Educação" },
-                    { "universidade", "Educação" },
-                    { "faculdade", "Educação" },
-
-                    // Utilidades
-                    { "energia", "Utilidades" },
-                    { "água", "Utilidades" },
-                    { "internet", "Utilidades" },
-                    { "telefone", "Utilidades" },
-                    { "conta", "Utilidades" },
-                            };
-                        }
-                    }
+}

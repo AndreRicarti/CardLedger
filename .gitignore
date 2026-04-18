@@ -361,3 +361,27 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# =============================================================
+#  CardLedger — regras específicas do projeto
+# =============================================================
+
+# SQLite — banco de dados gerado em runtime pelo EF Core
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# ASP.NET Core — configurações de ambiente local (podem conter secrets)
+appsettings.Development.json
+appsettings.Local.json
+appsettings.*.local.json
+
+# Variáveis de ambiente e segredos
+.env
+.env.*
+secrets.json
+
+# Visual Studio — arquivo de preferências pessoais do projeto
+*.csproj.user

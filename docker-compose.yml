@@ -1,0 +1,20 @@
+version: "3"
+services:
+  api:
+    build: ./invoice-api
+    ports:
+      - "7086:8080"
+    volumes:
+      - api-data:/app/data
+    restart: unless-stopped
+
+  frontend:
+    build: ./invoice-dashboard
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  api-data:

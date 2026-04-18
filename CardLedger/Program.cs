@@ -9,9 +9,10 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
 
-// Adicionar EF Core com SQLite
+// SQLite aponta para o volume montado em /app/data
+var dbPath = Path.Combine("data", "invoices.db");
 builder.Services.AddDbContext<InvoiceDbContext>(options =>
-    options.UseSqlite("Data Source=invoices.db"));
+    options.UseSqlite($"Data Source={dbPath}"));
 
 // Registrar serviços
 builder.Services.AddScoped<ICategorizationService, CategorizationService>();
@@ -19,16 +20,7 @@ builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<ICsvParserService, CsvParserService>();
 
-// Adicionar CORS
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll", policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
-});
+
 
 var app = builder.Build();
 
@@ -39,20 +31,16 @@ using (var scope = app.Services.CreateScope())
     db.Database.EnsureCreated();
 }
 
-// Configure the HTTP request pipeline
-if (app.Environment.IsDevelopment())
+// Swagger disponível em todos os ambientes (útil no ZimaOS)
+app.MapOpenApi();
+app.UseSwagger();
+app.UseSwaggerUI(options =>
 {
-    app.MapOpenApi();
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "CardLedger API v1");
-        options.RoutePrefix = string.Empty;
-    });
-}
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "CardLedger API v1");
+    options.RoutePrefix = string.Empty;
+});
 
-app.UseHttpsRedirection();
-app.UseCors("AllowAll");
+// HTTPS removido — TLS é responsabilidade do Nginx
 app.UseAuthorization();
 app.MapControllers();
 

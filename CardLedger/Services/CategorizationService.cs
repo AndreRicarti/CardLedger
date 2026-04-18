@@ -201,6 +201,11 @@ public sealed class CategorizationService : ICategorizationService
             { "açougue", ("Alimentação", 10) },
             { "hortifruti", ("Alimentação", 9) },
             { "feira", ("Alimentação", 8) },
+            { "carrefour", ("Alimentação", 10) },
+            { "atacadao", ("Alimentação", 10) },
+            { "atacadão", ("Alimentação", 10) },
+            { "assai", ("Alimentação", 10) },
+            { "assaí", ("Alimentação", 10) },
 
             // Cafés e bebidas
             { "café", ("Alimentação", 9) },

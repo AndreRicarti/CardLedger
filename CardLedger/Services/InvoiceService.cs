@@ -9,6 +9,7 @@ public interface IInvoiceService
 {
     Task<MonthlyInvoice?> GetInvoiceByKeyAsync(string invoiceKey);
     Task<InvoiceSummary?> GetInvoiceSummaryByKeyAsync(string invoiceKey);
+    Task<List<TransactionsByCategoryResponse>?> GetTransactionsByCategoryAsync(string invoiceKey);
     Task<int> ImportTransactionsAsync(List<Transaction> transactions);
 }
 
@@ -84,6 +85,29 @@ public sealed class InvoiceService : IInvoiceService
             TransactionCount = transactions.Count,
             Categories = categories
         };
+    }
+
+    public async Task<List<TransactionsByCategoryResponse>?> GetTransactionsByCategoryAsync(string invoiceKey)
+    {
+        var transactions = await _context.Transactions
+            .Where(t => t.InvoiceKey == invoiceKey)
+            .OrderByDescending(t => t.Date)
+            .ToListAsync();
+
+        if (!transactions.Any())
+            return null;
+
+        return transactions
+            .GroupBy(t => t.Category)
+            .Select(g => new TransactionsByCategoryResponse
+            {
+                Category = g.Key,
+                TotalAmount = g.Sum(t => t.Amount),
+                TransactionCount = g.Count(),
+                Transactions = g.ToList()
+            })
+            .OrderByDescending(g => g.TotalAmount)
+            .ToList();
     }
 
     public async Task<int> ImportTransactionsAsync(List<Transaction> transactions)

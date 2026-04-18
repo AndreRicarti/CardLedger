@@ -67,6 +67,19 @@ namespace CardLedger.Controllers
         }
 
         /// <summary>
+        /// Transações de uma fatura agrupadas por categoria
+        /// </summary>
+        [HttpGet("key/{invoiceKey}/transactions-by-category")]
+        public async Task<ActionResult<List<TransactionsByCategoryResponse>>> GetTransactionsByCategory(string invoiceKey)
+        {
+            var result = await _invoiceService.GetTransactionsByCategoryAsync(invoiceKey);
+            if (result == null)
+                return NotFound(new { message = "Nenhuma transação encontrada para esta chave" });
+
+            return Ok(result);
+        }
+
+        /// <summary>
         /// Fatura de um mês específico
         /// </summary>
         [HttpGet("{year}/{month}")]

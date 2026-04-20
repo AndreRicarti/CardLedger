@@ -1,11 +1,13 @@
 name: CD
 
 on:
-  push:
-    branches: ["master"]
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
 
 jobs:
   publish-image:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'master' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -14,6 +16,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
 
       - name: Log in to GHCR
         uses: docker/login-action@v3

@@ -67,12 +67,20 @@ public sealed class CategorizationService : ICategorizationService
     {
         // Busca ordenada por prioridade (palavras mais específicas primeiro)
         var matches = _keywordRules
-            .Where(kvp => title.Contains(kvp.Key, StringComparison.OrdinalIgnoreCase))
+            .Where(kvp => ContainsKeyword(title, kvp.Key))
             .OrderByDescending(kvp => kvp.Value.priority)
             .ThenByDescending(kvp => kvp.Key.Length)
             .ToList();
 
         return matches.Any() ? matches.First().Value.category : null;
+    }
+
+    private static bool ContainsKeyword(string title, string keyword)
+    {
+        return System.Text.RegularExpressions.Regex.IsMatch(
+            title,
+            $@"(?<!\w){System.Text.RegularExpressions.Regex.Escape(keyword)}(?!\w)",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
     }
 
     private string? SearchMultiWordPattern(string title)
@@ -129,14 +137,19 @@ public sealed class CategorizationService : ICategorizationService
     private string? SearchPatternMatch(string title)
     {
         // Busca por padrões especiais
-        if (title.Contains("aplic") || title.Contains("app")) return "Assinatura";
-        if (title.Contains("banco") || title.Contains("transferência")) return "Utilidades";
-        if (title.Contains("boleto") || title.Contains("pix")) return "Utilidades";
-        if (title.Contains("jogo") || title.Contains("game")) return "Diversão";
-        if (title.Contains("manutenção") || title.Contains("reparo")) return "Casa";
-        if (title.Contains("limpeza") || title.Contains("material")) return "Casa";
+        if (title.Contains("aplic") || ContainsWord(title, "app")) return "Assinatura";
+        if (ContainsWord(title, "banco") || ContainsWord(title, "transferência")) return "Utilidades";
+        if (ContainsWord(title, "boleto") || ContainsWord(title, "pix")) return "Utilidades";
+        if (ContainsWord(title, "jogo") || ContainsWord(title, "game")) return "Diversão";
+        if (ContainsWord(title, "manutenção") || ContainsWord(title, "reparo")) return "Casa";
+        if (ContainsWord(title, "limpeza") || ContainsWord(title, "material")) return "Casa";
 
         return null;
+    }
+
+    private static bool ContainsWord(string title, string term)
+    {
+        return System.Text.RegularExpressions.Regex.IsMatch(title, $@"\b{System.Text.RegularExpressions.Regex.Escape(term)}\b");
     }
 
     private int CalculateSimilarity(string source, string target)

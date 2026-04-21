@@ -96,6 +96,8 @@ public sealed class CategorizationService : ICategorizationService
             { "bradesco", "Utilidades" },
             { "caixa", "Utilidades" },
             { "santander", "Utilidades" },
+            { "center car", "Supermercado" },
+            { "barueri drive", "Alimentação" },
         };
 
         foreach (var pattern in patterns)
@@ -209,17 +211,29 @@ public sealed class CategorizationService : ICategorizationService
             { "bar", ("Alimentação", 8) },
 
             // Supermercados e mercearias
-            { "supermercado", ("Alimentação", 10) },
-            { "mercado", ("Alimentação", 9) },
+            { "supermercado", ("Supermercado", 11) },
+            { "supermercados", ("Supermercado", 11) },
+            { "mercado", ("Supermercado", 9) },
             { "padaria", ("Alimentação", 10) },
             { "açougue", ("Alimentação", 10) },
-            { "hortifruti", ("Alimentação", 9) },
-            { "feira", ("Alimentação", 8) },
-            { "carrefour", ("Alimentação", 10) },
-            { "atacadao", ("Alimentação", 10) },
-            { "atacadão", ("Alimentação", 10) },
-            { "assai", ("Alimentação", 10) },
-            { "assaí", ("Alimentação", 10) },
+            { "hortifruti", ("Supermercado", 9) },
+            { "feira", ("Supermercado", 8) },
+            { "carrefour", ("Supermercado", 10) },
+            { "atacadao", ("Supermercado", 10) },
+            { "atacadão", ("Supermercado", 10) },
+            { "assai", ("Supermercado", 10) },
+            { "assaí", ("Supermercado", 10) },
+            { "quasetudo", ("Supermercado", 10) },
+            { "nescafe", ("Supermercado", 10) },
+            { "center car", ("Supermercado", 10) },
+
+            // Restaurantes e fast-food
+            { "thoca", ("Alimentação", 10) },
+            { "mcdonalds", ("Alimentação", 10) },
+            { "mcdonaldsecommerce", ("Alimentação", 11) },
+            { "99food", ("Alimentação", 11) },
+            { "barueri drive", ("Alimentação", 10) },
+            { "emporio", ("Alimentação", 9) },
 
             // Cafés e bebidas
             { "café", ("Alimentação", 9) },

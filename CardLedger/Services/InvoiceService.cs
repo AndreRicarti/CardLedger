@@ -112,22 +112,26 @@ public sealed class InvoiceService : IInvoiceService
 
     public async Task<int> ImportTransactionsAsync(List<Transaction> transactions)
     {
-        // Evita duplicatas
-        var existingDates = await _context.Transactions
-            .Select(t => new { t.Date, t.Title, t.Amount })
-            .ToListAsync();
-
-        var newTransactions = transactions
-            .Where(t => !existingDates.Any(e => e.Date == t.Date && e.Title == t.Title && e.Amount == t.Amount))
+        var invoiceKeys = transactions
+            .Where(t => !string.IsNullOrEmpty(t.InvoiceKey))
+            .Select(t => t.InvoiceKey!)
+            .Distinct()
             .ToList();
 
-        if (newTransactions.Any())
+        if (invoiceKeys.Any())
         {
-            _context.Transactions.AddRange(newTransactions);
-            await _context.SaveChangesAsync();
+            var existing = await _context.Transactions
+                .Where(t => invoiceKeys.Contains(t.InvoiceKey!))
+                .ToListAsync();
+
+            if (existing.Any())
+                _context.Transactions.RemoveRange(existing);
         }
 
-        return newTransactions.Count;
+        _context.Transactions.AddRange(transactions);
+        await _context.SaveChangesAsync();
+
+        return transactions.Count;
     }
 
     private string GetMonthName(int year, int month)

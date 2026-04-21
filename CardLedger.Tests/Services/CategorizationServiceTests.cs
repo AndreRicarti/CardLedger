@@ -10,6 +10,7 @@ public sealed class CategorizationServiceTests
 
     [Theory]
     [InlineData("restaurante do bairro", "Alimentação")]
+    [InlineData("55.769.239 Ana Paula R", "Alimentação")]
     [InlineData("pizzaria napoli", "Alimentação")]
     [InlineData("supermercado extra", "Alimentação")]
     [InlineData("padaria central", "Alimentação")]

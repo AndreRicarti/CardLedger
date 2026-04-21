@@ -199,6 +199,7 @@ public sealed class CategorizationService : ICategorizationService
         return new(StringComparer.OrdinalIgnoreCase)
         {
             // Alimentação (prioridade alta)
+            { "55.769.239 ana paula r", ("Alimentação", 11) },
             { "restaurante", ("Alimentação", 10) },
             { "pizzaria", ("Alimentação", 10) },
             { "hamburgueria", ("Alimentação", 10) },

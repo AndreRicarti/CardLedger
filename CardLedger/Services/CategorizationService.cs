@@ -202,6 +202,7 @@ public sealed class CategorizationService : ICategorizationService
         {
             // Alimentação (prioridade alta)
             { "55.769.239 ana paula r", ("Alimentação", 11) },
+            { "jw lima", ("Alimentação", 11) },
             { "restaurante", ("Alimentação", 10) },
             { "pizzaria", ("Alimentação", 10) },
             { "hamburgueria", ("Alimentação", 10) },
@@ -209,6 +210,7 @@ public sealed class CategorizationService : ICategorizationService
             { "cantina", ("Alimentação", 9) },
             { "boteco", ("Alimentação", 9) },
             { "bar", ("Alimentação", 8) },
+            { "pastel", ("Alimentação", 10) },
 
             // Supermercados e mercearias
             { "supermercado", ("Supermercado", 11) },
@@ -250,6 +252,7 @@ public sealed class CategorizationService : ICategorizationService
 
             // Transporte (prioridade alta)
             { "uber", ("Transporte", 10) },
+            { "uberrides", ("Transporte", 10) },
             { "uber eats", ("Alimentação", 10) },
             { "ifood", ("Alimentação", 10) },
             { "ifd*", ("Alimentação", 10) },
@@ -283,6 +286,7 @@ public sealed class CategorizationService : ICategorizationService
             { "zona azul barueri", ("Carro", 11) },
             { "nutag", ("Carro", 11) },
             { "shellbox", ("Carro", 11) },
+            { "rei tupa", ("Carro", 11) },
 
             // Games
             { "steam", ("Games", 11) },
@@ -290,6 +294,7 @@ public sealed class CategorizationService : ICategorizationService
 
             // Assinaturas & Contas
             { "conta vivo", ("Assinaturas & Contas", 11) },
+            { "github", ("Assinaturas & Contas", 10) },
             { "ig*floraenergia", ("Assinaturas & Contas", 11) },
             { "enel", ("Assinaturas & Contas", 11) },
             { "enelsp", ("Assinaturas & Contas", 11) },
@@ -328,6 +333,14 @@ public sealed class CategorizationService : ICategorizationService
             { "banggood", ("Compras Online", 9) },
             { "fasttech", ("Compras Online", 9) },
             { "gearbest", ("Compras Online", 9) },
+
+            // Compras Avulsas
+            { "compra avulsa", ("Compras Avulsas", 10) },
+            { "compras avulsas", ("Compras Avulsas", 10) },
+
+            // Terceiros
+            { "terceiros", ("Terceiros", 10) },
+            { "pagamento terceiros", ("Terceiros", 10) },
 
             // Saúde e farmácia
             { "rdsaude", ("Saúde", 11) },

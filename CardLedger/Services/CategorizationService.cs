@@ -274,6 +274,12 @@ public sealed class CategorizationService : ICategorizationService
             { "garagem", ("Transporte", 9) },
             { "manobrista", ("Transporte", 9) },
 
+            // Carro
+            { "park car one", ("Carro", 11) },
+            { "zona azul barueri", ("Carro", 11) },
+            { "nutag", ("Carro", 11) },
+            { "shellbox", ("Carro", 11) },
+
             // Assinaturas & Contas
             { "conta vivo", ("Assinaturas & Contas", 11) },
             { "ig*floraenergia", ("Assinaturas & Contas", 11) },

@@ -31,6 +31,11 @@ public sealed class CategorizationServiceTests
     // Assinaturas & Contas - contas fixas
     [InlineData("Enel Distribuicao", "Assinaturas & Contas")]
     [InlineData("Flexpag*Enelsp", "Assinaturas & Contas")]
+    // Carro
+    [InlineData("Park Car One", "Carro")]
+    [InlineData("Zona Azul Barueri", "Carro")]
+    [InlineData("NuTag*EIQ0E15", "Carro")]
+    [InlineData("Ec *Shellbox", "Carro")]
     [InlineData("Fmu Mensalidade", "Assinaturas & Contas")]
     [InlineData("Sabesp Fatura", "Assinaturas & Contas")]
     [InlineData("Melimais Assinatura", "Assinaturas & Contas")]

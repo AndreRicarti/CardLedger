@@ -277,6 +277,12 @@ public sealed class CategorizationService : ICategorizationService
             // Assinaturas & Contas
             { "conta vivo", ("Assinaturas & Contas", 11) },
             { "ig*floraenergia", ("Assinaturas & Contas", 11) },
+            { "enel", ("Assinaturas & Contas", 11) },
+            { "fmu", ("Assinaturas & Contas", 11) },
+            { "sabesp", ("Assinaturas & Contas", 11) },
+            { "melimais", ("Assinaturas & Contas", 11) },
+            { "alares", ("Assinaturas & Contas", 11) },
+            { "youtubepremium", ("Assinaturas & Contas", 11) },
             { "youtube", ("Assinaturas & Contas", 10) },
             { "netflix", ("Assinaturas & Contas", 10) },
             { "spotify", ("Assinaturas & Contas", 10) },
@@ -295,7 +301,7 @@ public sealed class CategorizationService : ICategorizationService
             { "plano", ("Assinaturas & Contas", 6) },
 
             // Compras Online
-            { "shopee", ("Compras Online", 10) },
+            { "shopee", ("Mayara", 10) },
             { "amazon", ("Compras Online", 10) },
             { "aliexpress", ("Compras Online", 10) },
             { "mercado livre", ("Compras Online", 10) },

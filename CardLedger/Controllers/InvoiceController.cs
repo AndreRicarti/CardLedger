@@ -10,11 +10,13 @@ namespace CardLedger.Controllers
     {
         private readonly IInvoiceService _invoiceService;
         private readonly ICsvParserService _csvParserService;
+        private readonly ITransactionService _transactionService;
 
-        public InvoiceController(IInvoiceService invoiceService, ICsvParserService csvParserService)
+        public InvoiceController(IInvoiceService invoiceService, ICsvParserService csvParserService, ITransactionService transactionService)
         {
             _invoiceService = invoiceService;
             _csvParserService = csvParserService;
+            _transactionService = transactionService;
         }
 
         /// <summary>
@@ -51,6 +53,22 @@ namespace CardLedger.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
+        }
+
+        /// <summary>
+        /// Alterar a categoria de uma transação de uma fatura específica
+        /// </summary>
+        [HttpPatch("key/{invoiceKey}/transactions/{id}/category")]
+        public async Task<IActionResult> UpdateTransactionCategory(string invoiceKey, int id, [FromBody] string category)
+        {
+            if (string.IsNullOrWhiteSpace(category))
+                return BadRequest(new { message = "Categoria não pode estar vazia" });
+
+            var updated = await _transactionService.UpdateCategoryByInvoiceAsync(invoiceKey, id, category);
+            if (!updated)
+                return NotFound(new { message = "Transação não encontrada para esta fatura" });
+
+            return Ok(new { message = "Categoria atualizada com sucesso" });
         }
 
         /// <summary>

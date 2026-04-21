@@ -51,6 +51,10 @@ public sealed class CategorizationServiceTests
     [InlineData("Center Car Bom Corte", "Supermercado")]
     // Alimentação
     [InlineData("Thoca Beatriz", "Alimentação")]
+    [InlineData("Keeta Delivery", "Alimentação")]
+    [InlineData("Ragazzo", "Alimentação")]
+    [InlineData("Restaur 123", "Alimentação")]
+    [InlineData("Salgados do Ze", "Alimentação")]
     [InlineData("Thoca Burguer", "Alimentação")]
     [InlineData("Mcdonaldsecommerce", "Alimentação")]
     [InlineData("99food *32.106.540 Gio", "Alimentação")]

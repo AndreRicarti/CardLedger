@@ -228,6 +228,10 @@ public sealed class CategorizationService : ICategorizationService
             { "center car", ("Supermercado", 10) },
 
             // Restaurantes e fast-food
+            { "keeta", ("Alimentação", 10) },
+            { "ragazzo", ("Alimentação", 10) },
+            { "restaur", ("Alimentação", 10) },
+            { "salgados", ("Alimentação", 10) },
             { "thoca", ("Alimentação", 10) },
             { "mcdonalds", ("Alimentação", 10) },
             { "mcdonaldsecommerce", ("Alimentação", 11) },

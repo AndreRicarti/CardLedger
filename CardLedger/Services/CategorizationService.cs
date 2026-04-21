@@ -284,6 +284,10 @@ public sealed class CategorizationService : ICategorizationService
             { "nutag", ("Carro", 11) },
             { "shellbox", ("Carro", 11) },
 
+            // Games
+            { "steam", ("Games", 11) },
+            { "greenman", ("Games", 11) },
+
             // Assinaturas & Contas
             { "conta vivo", ("Assinaturas & Contas", 11) },
             { "ig*floraenergia", ("Assinaturas & Contas", 11) },

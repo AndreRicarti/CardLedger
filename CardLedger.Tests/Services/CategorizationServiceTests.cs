@@ -36,6 +36,9 @@ public sealed class CategorizationServiceTests
     [InlineData("Zona Azul Barueri", "Carro")]
     [InlineData("NuTag*EIQ0E15", "Carro")]
     [InlineData("Ec *Shellbox", "Carro")]
+    // Games
+    [InlineData("Steam Purchase", "Games")]
+    [InlineData("Greenman Gaming", "Games")]
     [InlineData("Fmu Mensalidade", "Assinaturas & Contas")]
     [InlineData("Sabesp Fatura", "Assinaturas & Contas")]
     [InlineData("Melimais Assinatura", "Assinaturas & Contas")]

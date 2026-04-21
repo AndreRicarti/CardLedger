@@ -45,6 +45,9 @@ public sealed class CsvParserService : ICsvParserService
                     decimal.TryParse(parts[2], NumberStyles.Any, CultureInfo.InvariantCulture, out var amount))
                 {
                     var title = parts[1];
+
+                    if (title.Equals("Pagamento recebido", StringComparison.OrdinalIgnoreCase))
+                        continue;
                     var isRefund = amount < 0;
                     var category = _categorizationService.CategorizeTransaction(title);
 

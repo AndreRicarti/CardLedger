@@ -30,6 +30,7 @@ public sealed class CategorizationServiceTests
     [InlineData("conta de energia", "Utilidades")]
     // Assinaturas & Contas - contas fixas
     [InlineData("Enel Distribuicao", "Assinaturas & Contas")]
+    [InlineData("Flexpag*Enelsp", "Assinaturas & Contas")]
     [InlineData("Fmu Mensalidade", "Assinaturas & Contas")]
     [InlineData("Sabesp Fatura", "Assinaturas & Contas")]
     [InlineData("Melimais Assinatura", "Assinaturas & Contas")]

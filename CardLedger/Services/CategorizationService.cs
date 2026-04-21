@@ -278,6 +278,8 @@ public sealed class CategorizationService : ICategorizationService
             { "conta vivo", ("Assinaturas & Contas", 11) },
             { "ig*floraenergia", ("Assinaturas & Contas", 11) },
             { "enel", ("Assinaturas & Contas", 11) },
+            { "enelsp", ("Assinaturas & Contas", 11) },
+            { "flexpag", ("Assinaturas & Contas", 11) },
             { "fmu", ("Assinaturas & Contas", 11) },
             { "sabesp", ("Assinaturas & Contas", 11) },
             { "melimais", ("Assinaturas & Contas", 11) },

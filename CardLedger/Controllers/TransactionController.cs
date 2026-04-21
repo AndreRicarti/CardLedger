@@ -16,6 +16,16 @@ namespace CardLedger.Controllers
         }
 
         /// <summary>
+        /// Retornar todas as categorias distintas
+        /// </summary>
+        [HttpGet("categories")]
+        public async Task<ActionResult<List<string>>> GetCategories()
+        {
+            var categories = await _transactionService.GetCategoriesAsync();
+            return Ok(categories);
+        }
+
+        /// <summary>
         /// Filtrar transações por ano, mês e/ou categoria
         /// </summary>
         [HttpGet]

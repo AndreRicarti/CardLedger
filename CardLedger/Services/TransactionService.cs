@@ -10,6 +10,7 @@ namespace CardLedger.Services
         Task<Transaction?> GetTransactionAsync(int id);
         Task<bool> UpdateCategoryAsync(int id, string category);
         Task<bool> UpdateCategoryByInvoiceAsync(string invoiceKey, int id, string category);
+        Task<List<string>> GetCategoriesAsync();
     }
 
     public sealed class TransactionService : ITransactionService
@@ -64,6 +65,15 @@ namespace CardLedger.Services
             transaction.Category = category;
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<List<string>> GetCategoriesAsync()
+        {
+            return await _context.Transactions
+                .Select(t => t.Category)
+                .Distinct()
+                .OrderBy(c => c)
+                .ToListAsync();
         }
     }
 }

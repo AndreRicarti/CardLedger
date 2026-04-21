@@ -48,20 +48,11 @@ public class InvoiceDbContext : DbContext
             new Category { Id = 5, Name = "Carro", CreatedAt = now, UpdatedAt = now },
             new Category { Id = 6, Name = "Games", CreatedAt = now, UpdatedAt = now },
             new Category { Id = 7, Name = "Assinaturas & Contas", CreatedAt = now, UpdatedAt = now },
-            new Category { Id = 8, Name = "Assinatura", CreatedAt = now, UpdatedAt = now },
-            new Category { Id = 9, Name = "Mayara", CreatedAt = now, UpdatedAt = now },
-            new Category { Id = 10, Name = "Compras Online", CreatedAt = now, UpdatedAt = now },
-            new Category { Id = 11, Name = "Saúde", CreatedAt = now, UpdatedAt = now },
-            new Category { Id = 12, Name = "Educação", CreatedAt = now, UpdatedAt = now },
-            new Category { Id = 13, Name = "Utilidades", CreatedAt = now, UpdatedAt = now },
-            new Category { Id = 14, Name = "Casa", CreatedAt = now, UpdatedAt = now },
-            new Category { Id = 15, Name = "Vestuário", CreatedAt = now, UpdatedAt = now },
-            new Category { Id = 16, Name = "Diversão", CreatedAt = now, UpdatedAt = now },
-            new Category { Id = 17, Name = "Beleza", CreatedAt = now, UpdatedAt = now },
-            new Category { Id = 18, Name = "Esportes", CreatedAt = now, UpdatedAt = now },
-            new Category { Id = 19, Name = "Parcelado", CreatedAt = now, UpdatedAt = now },
-            new Category { Id = 20, Name = "Compras Avulsas", CreatedAt = now, UpdatedAt = now },
-            new Category { Id = 21, Name = "Terceiros", CreatedAt = now, UpdatedAt = now }
+            new Category { Id = 8, Name = "Mayara", CreatedAt = now, UpdatedAt = now },
+            new Category { Id = 9, Name = "Saúde", CreatedAt = now, UpdatedAt = now },
+            new Category { Id = 10, Name = "Parcelado", CreatedAt = now, UpdatedAt = now },
+            new Category { Id = 11, Name = "Compras Avulsas", CreatedAt = now, UpdatedAt = now },
+            new Category { Id = 12, Name = "Terceiros", CreatedAt = now, UpdatedAt = now }
         );
     }
 }

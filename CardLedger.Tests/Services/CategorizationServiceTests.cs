@@ -17,6 +17,8 @@ public sealed class CategorizationServiceTests
     [InlineData("99 corrida", "Transporte")]
     [InlineData("posto de gasolina", "Transporte")]
     [InlineData("youtube premium", "Assinaturas & Contas")]
+    [InlineData("Conta Vivo", "Assinaturas & Contas")]
+    [InlineData("Ig*Floraenergia", "Assinaturas & Contas")]
     [InlineData("netflix", "Assinaturas & Contas")]
     [InlineData("spotify", "Assinaturas & Contas")]
     [InlineData("shopee compra", "Compras Online")]

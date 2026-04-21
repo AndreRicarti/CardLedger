@@ -260,6 +260,8 @@ public sealed class CategorizationService : ICategorizationService
             { "manobrista", ("Transporte", 9) },
 
             // Assinaturas & Contas
+            { "conta vivo", ("Assinaturas & Contas", 11) },
+            { "ig*floraenergia", ("Assinaturas & Contas", 11) },
             { "youtube", ("Assinaturas & Contas", 10) },
             { "netflix", ("Assinaturas & Contas", 10) },
             { "spotify", ("Assinaturas & Contas", 10) },

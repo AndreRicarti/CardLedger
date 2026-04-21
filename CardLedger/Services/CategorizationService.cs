@@ -330,6 +330,7 @@ public sealed class CategorizationService : ICategorizationService
             { "gearbest", ("Compras Online", 9) },
 
             // Saúde e farmácia
+            { "rdsaude", ("Saúde", 11) },
             { "farmácia", ("Saúde", 10) },
             { "farmacia", ("Saúde", 10) },
             { "manipulação", ("Saúde", 10) },

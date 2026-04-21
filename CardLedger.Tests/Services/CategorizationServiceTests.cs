@@ -25,6 +25,7 @@ public sealed class CategorizationServiceTests
     [InlineData("shopee compra", "Mayara")]
     [InlineData("amazon pedido", "Compras Online")]
     [InlineData("farmacia popular", "Saúde")]
+    [InlineData("Rdsaude Online", "Saúde")]
     [InlineData("hospital das clinicas", "Saúde")]
     [InlineData("udemy curso", "Educação")]
     [InlineData("conta de energia", "Utilidades")]

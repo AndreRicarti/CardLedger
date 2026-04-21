@@ -25,6 +25,7 @@ public sealed class InvoiceService : IInvoiceService
     public async Task<MonthlyInvoice?> GetInvoiceByKeyAsync(string invoiceKey)
     {
         var transactions = await _context.Transactions
+            .Include(t => t.CategoryEntity)
             .Where(t => t.InvoiceKey == invoiceKey)
             .ToListAsync();
 
@@ -51,6 +52,7 @@ public sealed class InvoiceService : IInvoiceService
     public async Task<InvoiceSummary?> GetInvoiceSummaryByKeyAsync(string invoiceKey)
     {
         var transactions = await _context.Transactions
+            .Include(t => t.CategoryEntity)
             .Where(t => t.InvoiceKey == invoiceKey)
             .ToListAsync();
 
@@ -65,7 +67,7 @@ public sealed class InvoiceService : IInvoiceService
 
         var categories = transactions
             .Where(t => !t.IsRefund)
-            .GroupBy(t => t.Category)
+            .GroupBy(t => t.CategoryEntity != null ? t.CategoryEntity.Name : "Não Categorizado")
             .Select(g => new CategorySummary
             {
                 Category = g.Key,
@@ -92,10 +94,11 @@ public sealed class InvoiceService : IInvoiceService
         string? category = null)
     {
         var query = _context.Transactions
+            .Include(t => t.CategoryEntity)
             .Where(t => t.InvoiceKey == invoiceKey);
 
         if (!string.IsNullOrEmpty(category))
-            query = query.Where(t => t.Category == category);
+            query = query.Where(t => t.CategoryEntity != null && t.CategoryEntity.Name == category);
 
         var transactions = await query
             .OrderByDescending(t => t.Date)
@@ -105,7 +108,7 @@ public sealed class InvoiceService : IInvoiceService
             return null;
 
         return transactions
-            .GroupBy(t => t.Category)
+            .GroupBy(t => t.CategoryEntity != null ? t.CategoryEntity.Name : "Não Categorizado")
             .Select(g => new TransactionsByCategoryResponse
             {
                 Category = g.Key,
@@ -119,6 +122,24 @@ public sealed class InvoiceService : IInvoiceService
 
     public async Task<int> ImportTransactionsAsync(List<Transaction> transactions)
     {
+        var categories = await _context.Categories.ToListAsync();
+        var categoryMap = categories
+            .GroupBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.First().Id, StringComparer.OrdinalIgnoreCase);
+
+        foreach (var transaction in transactions)
+        {
+            var categoryName = string.IsNullOrWhiteSpace(transaction.Category) ? "Não Categorizado" : transaction.Category;
+            if (categoryMap.TryGetValue(categoryName, out var categoryId))
+            {
+                transaction.CategoryId = categoryId;
+            }
+            else if (categoryMap.TryGetValue("Não Categorizado", out var defaultCategoryId))
+            {
+                transaction.CategoryId = defaultCategoryId;
+            }
+        }
+
         var invoiceKeys = transactions
             .Where(t => !string.IsNullOrEmpty(t.InvoiceKey))
             .Select(t => t.InvoiceKey!)

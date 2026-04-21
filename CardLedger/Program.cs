@@ -20,15 +20,45 @@ builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<ICsvParserService, CsvParserService>();
 
-
-
 var app = builder.Build();
 
-// Criar banco de dados automaticamente
+// Criar/atualizar banco de dados automaticamente
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<InvoiceDbContext>();
-    db.Database.EnsureCreated();
+
+    var hasTransactionsTable = await db.Database
+        .SqlQueryRaw<int>("""
+            SELECT COUNT(1)
+            FROM sqlite_master
+            WHERE type = 'table' AND name = 'Transactions'
+            """)
+        .SingleAsync() > 0;
+
+    var hasMigrationsHistoryTable = await db.Database
+        .SqlQueryRaw<int>("""
+            SELECT COUNT(1)
+            FROM sqlite_master
+            WHERE type = 'table' AND name = '__EFMigrationsHistory'
+            """)
+        .SingleAsync() > 0;
+
+    if (hasTransactionsTable && !hasMigrationsHistoryTable)
+    {
+        await db.Database.ExecuteSqlRawAsync("""
+            CREATE TABLE IF NOT EXISTS "__EFMigrationsHistory" (
+                "MigrationId" TEXT NOT NULL CONSTRAINT "PK___EFMigrationsHistory" PRIMARY KEY,
+                "ProductVersion" TEXT NOT NULL
+            );
+            """);
+
+        await db.Database.ExecuteSqlRawAsync("""
+            INSERT OR IGNORE INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+            VALUES ('20260416003519_InitialCreate', '10.0.6');
+            """);
+    }
+
+    db.Database.Migrate();
 }
 
 // Swagger disponível em todos os ambientes (útil no ZimaOS)

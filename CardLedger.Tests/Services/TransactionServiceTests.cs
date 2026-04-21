@@ -19,6 +19,7 @@ public sealed class TransactionServiceTests : IDisposable
             .Options;
 
         _context = new InvoiceDbContext(options);
+        _context.Database.EnsureCreated();
         _sut = new TransactionService(_context);
     }
 
@@ -148,34 +149,83 @@ public sealed class TransactionServiceTests : IDisposable
         _context.Transactions.Add(transaction);
         await _context.SaveChangesAsync();
 
+        var transporteId = await _context.Categories
+            .Where(c => c.Name == "Transporte")
+            .Select(c => c.Id)
+            .FirstAsync();
+
         // Act
-        var success = await _sut.UpdateCategoryAsync(transaction.Id, "Transporte");
+        var success = await _sut.UpdateCategoryAsync(transaction.Id, transporteId);
 
         // Assert
         success.Should().BeTrue();
-        var updated = await _context.Transactions.FindAsync(transaction.Id);
-        updated!.Category.Should().Be("Transporte");
+        var updated = await _context.Transactions
+            .Include(t => t.CategoryEntity)
+            .FirstAsync(t => t.Id == transaction.Id);
+        updated.CategoryEntity!.Name.Should().Be("Transporte");
     }
 
     [Fact]
     public async Task UpdateCategoryAsync_IdInexistente_RetornaFalse()
     {
+        var transporteId = await _context.Categories
+            .Where(c => c.Name == "Transporte")
+            .Select(c => c.Id)
+            .FirstAsync();
+
         // Act
-        var success = await _sut.UpdateCategoryAsync(9999, "Transporte");
+        var success = await _sut.UpdateCategoryAsync(9999, transporteId);
 
         // Assert
         success.Should().BeFalse();
     }
 
-    private static Transaction BuildTransaction(int year, int month, string category) => new()
+    [Fact]
+    public async Task GetCategoriesAsync_RetornaIdENomeOrdenado()
     {
-        Title = "Transacao Teste",
-        Amount = 100m,
-        Category = category,
-        Year = year,
-        Month = month,
-        Date = new DateOnly(year, month, 15),
-        InvoiceKey = $"{year}-{month:D2}",
-        Source = "nubank"
-    };
+        // Act
+        var result = await _sut.GetCategoriesAsync();
+
+        // Assert
+        result.Should().NotBeEmpty();
+        result.Should().OnlyContain(c => c.Id > 0 && !string.IsNullOrWhiteSpace(c.Name));
+        result.Select(c => c.Name).Should().BeInAscendingOrder();
+        result.Should().Contain(c => c.Name == "Compras Avulsas");
+        result.Should().Contain(c => c.Name == "Terceiros");
+    }
+
+    [Fact]
+    public async Task UpdateCategoryAsync_CategoryIdInvalido_RetornaFalse()
+    {
+        // Arrange
+        var transaction = BuildTransaction(2024, 3, "Alimentação");
+        _context.Transactions.Add(transaction);
+        await _context.SaveChangesAsync();
+
+        // Act
+        var success = await _sut.UpdateCategoryAsync(transaction.Id, 999999);
+
+        // Assert
+        success.Should().BeFalse();
+    }
+
+    private Transaction BuildTransaction(int year, int month, string category)
+    {
+        var categoryId = _context.Categories
+            .Where(c => c.Name == category)
+            .Select(c => c.Id)
+            .First();
+
+        return new Transaction
+        {
+            Title = "Transacao Teste",
+            Amount = 100m,
+            CategoryId = categoryId,
+            Year = year,
+            Month = month,
+            Date = new DateOnly(year, month, 15),
+            InvoiceKey = $"{year}-{month:D2}",
+            Source = "nubank"
+        };
+    }
 }

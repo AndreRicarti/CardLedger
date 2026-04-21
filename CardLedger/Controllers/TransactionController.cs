@@ -4,6 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CardLedger.Controllers
 {
+    public sealed class UpdateCategoryRequest
+    {
+        public int CategoryId { get; set; }
+    }
+
     [ApiController]
     [Route("api/[controller]")]
     public class TransactionController : ControllerBase
@@ -19,7 +24,7 @@ namespace CardLedger.Controllers
         /// Retornar todas as categorias distintas
         /// </summary>
         [HttpGet("categories")]
-        public async Task<ActionResult<List<string>>> GetCategories()
+        public async Task<ActionResult<List<CategoryOption>>> GetCategories()
         {
             var categories = await _transactionService.GetCategoriesAsync();
             return Ok(categories);
@@ -55,14 +60,14 @@ namespace CardLedger.Controllers
         /// Atualizar categoria de uma transação
         /// </summary>
         [HttpPatch("{id}/category")]
-        public async Task<IActionResult> UpdateCategory(int id, [FromBody] string category)
+        public async Task<IActionResult> UpdateCategory(int id, [FromBody] UpdateCategoryRequest request)
         {
-            if (string.IsNullOrEmpty(category))
-                return BadRequest(new { message = "Categoria não pode estar vazia" });
+            if (request is null || request.CategoryId <= 0)
+                return BadRequest(new { message = "CategoryId inválido" });
 
-            var updated = await _transactionService.UpdateCategoryAsync(id, category);
+            var updated = await _transactionService.UpdateCategoryAsync(id, request.CategoryId);
             if (!updated)
-                return NotFound(new { message = "Transação não encontrada" });
+                return NotFound(new { message = "Transação ou categoria não encontrada" });
 
             return Ok(new { message = "Categoria atualizada com sucesso" });
         }

@@ -8,9 +8,9 @@ namespace CardLedger.Services
     {
         Task<List<Transaction>> FilterTransactionsAsync(int? year = null, int? month = null, string? category = null);
         Task<Transaction?> GetTransactionAsync(int id);
-        Task<bool> UpdateCategoryAsync(int id, string category);
-        Task<bool> UpdateCategoryByInvoiceAsync(string invoiceKey, int id, string category);
-        Task<List<string>> GetCategoriesAsync();
+        Task<bool> UpdateCategoryAsync(int id, int categoryId);
+        Task<bool> UpdateCategoryByInvoiceAsync(string invoiceKey, int id, int categoryId);
+        Task<List<CategoryOption>> GetCategoriesAsync();
     }
 
     public sealed class TransactionService : ITransactionService
@@ -24,7 +24,9 @@ namespace CardLedger.Services
 
         public async Task<List<Transaction>> FilterTransactionsAsync(int? year = null, int? month = null, string? category = null)
         {
-            var query = _context.Transactions.AsQueryable();
+            var query = _context.Transactions
+                .Include(t => t.CategoryEntity)
+                .AsQueryable();
 
             if (year.HasValue)
                 query = query.Where(t => t.Year == year);
@@ -33,28 +35,34 @@ namespace CardLedger.Services
                 query = query.Where(t => t.Month == month);
 
             if (!string.IsNullOrEmpty(category))
-                query = query.Where(t => t.Category == category);
+                query = query.Where(t => t.CategoryEntity != null && t.CategoryEntity.Name == category);
 
             return await query.OrderByDescending(t => t.Date).ToListAsync();
         }
 
         public async Task<Transaction?> GetTransactionAsync(int id)
         {
-            return await _context.Transactions.FindAsync(id);
+            return await _context.Transactions
+                .Include(t => t.CategoryEntity)
+                .FirstOrDefaultAsync(t => t.Id == id);
         }
 
-        public async Task<bool> UpdateCategoryAsync(int id, string category)
+        public async Task<bool> UpdateCategoryAsync(int id, int categoryId)
         {
             var transaction = await _context.Transactions.FindAsync(id);
             if (transaction == null)
                 return false;
 
-            transaction.Category = category;
+            var categoryExists = await _context.Categories.AnyAsync(c => c.Id == categoryId);
+            if (!categoryExists)
+                return false;
+
+            transaction.CategoryId = categoryId;
             await _context.SaveChangesAsync();
             return true;
         }
 
-        public async Task<bool> UpdateCategoryByInvoiceAsync(string invoiceKey, int id, string category)
+        public async Task<bool> UpdateCategoryByInvoiceAsync(string invoiceKey, int id, int categoryId)
         {
             var transaction = await _context.Transactions
                 .FirstOrDefaultAsync(t => t.Id == id && t.InvoiceKey == invoiceKey);
@@ -62,17 +70,20 @@ namespace CardLedger.Services
             if (transaction == null)
                 return false;
 
-            transaction.Category = category;
+            var categoryExists = await _context.Categories.AnyAsync(c => c.Id == categoryId);
+            if (!categoryExists)
+                return false;
+
+            transaction.CategoryId = categoryId;
             await _context.SaveChangesAsync();
             return true;
         }
 
-        public async Task<List<string>> GetCategoriesAsync()
+        public async Task<List<CategoryOption>> GetCategoriesAsync()
         {
-            return await _context.Transactions
-                .Select(t => t.Category)
-                .Distinct()
-                .OrderBy(c => c)
+            return await _context.Categories
+                .OrderBy(c => c.Name)
+                .Select(c => new CategoryOption { Id = c.Id, Name = c.Name })
                 .ToListAsync();
         }
     }

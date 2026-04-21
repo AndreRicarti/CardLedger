@@ -19,6 +19,7 @@ public sealed class InvoiceServiceTests : IDisposable
             .Options;
 
         _context = new InvoiceDbContext(options);
+        _context.Database.EnsureCreated();
         _sut = new InvoiceService(_context);
     }
 
@@ -162,7 +163,7 @@ public sealed class InvoiceServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task ImportTransactionsAsync_TransacaoDuplicada_NaoInsereNovamente()
+    public async Task ImportTransactionsAsync_TransacaoDuplicada_SubstituiMesERetornaContagemImportada()
     {
         // Arrange
         var existing = BuildTransaction("2024-03", "Compra A", 100m);
@@ -176,25 +177,33 @@ public sealed class InvoiceServiceTests : IDisposable
         var count = await _sut.ImportTransactionsAsync([duplicate]);
 
         // Assert
-        count.Should().Be(0);
+        count.Should().Be(1);
         _context.Transactions.Should().HaveCount(1);
     }
 
-    private static Transaction BuildTransaction(
+    private Transaction BuildTransaction(
         string invoiceKey,
         string title,
         decimal amount,
         bool isRefund = false,
-        string category = "Não Categorizado") => new()
+        string category = "Não Categorizado")
     {
-        InvoiceKey = invoiceKey,
-        Title = title,
-        Amount = amount,
-        IsRefund = isRefund,
-        Category = category,
-        Date = new DateOnly(2024, 3, 15),
-        Year = 2024,
-        Month = 3,
-        Source = "nubank"
-    };
+        var categoryId = _context.Categories
+            .Where(c => c.Name == category)
+            .Select(c => c.Id)
+            .First();
+
+        return new Transaction
+        {
+            InvoiceKey = invoiceKey,
+            Title = title,
+            Amount = amount,
+            IsRefund = isRefund,
+            CategoryId = categoryId,
+            Date = new DateOnly(2024, 3, 15),
+            Year = 2024,
+            Month = 3,
+            Source = "nubank"
+        };
+    }
 }

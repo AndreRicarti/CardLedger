@@ -88,9 +88,12 @@ namespace CardLedger.Controllers
         /// Transações de uma fatura agrupadas por categoria
         /// </summary>
         [HttpGet("key/{invoiceKey}/transactions-by-category")]
-        public async Task<ActionResult<List<TransactionsByCategoryResponse>>> GetTransactionsByCategory(string invoiceKey)
+        public async Task<ActionResult<List<TransactionsByCategoryResponse>>> GetTransactionsByCategory(
+            string invoiceKey,
+            [FromQuery] string? category = null)
         {
-            var result = await _invoiceService.GetTransactionsByCategoryAsync(invoiceKey);
+            var result = await _invoiceService.GetTransactionsByCategoryAsync(invoiceKey, category);
+            
             if (result == null)
                 return NotFound(new { message = "Nenhuma transação encontrada para esta chave" });
 

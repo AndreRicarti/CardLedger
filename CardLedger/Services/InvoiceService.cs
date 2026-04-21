@@ -9,7 +9,7 @@ public interface IInvoiceService
 {
     Task<MonthlyInvoice?> GetInvoiceByKeyAsync(string invoiceKey);
     Task<InvoiceSummary?> GetInvoiceSummaryByKeyAsync(string invoiceKey);
-    Task<List<TransactionsByCategoryResponse>?> GetTransactionsByCategoryAsync(string invoiceKey);
+    Task<List<TransactionsByCategoryResponse>?> GetTransactionsByCategoryAsync(string invoiceKey, string? category = null);
     Task<int> ImportTransactionsAsync(List<Transaction> transactions);
 }
 
@@ -87,10 +87,17 @@ public sealed class InvoiceService : IInvoiceService
         };
     }
 
-    public async Task<List<TransactionsByCategoryResponse>?> GetTransactionsByCategoryAsync(string invoiceKey)
+    public async Task<List<TransactionsByCategoryResponse>?> GetTransactionsByCategoryAsync(
+        string invoiceKey,
+        string? category = null)
     {
-        var transactions = await _context.Transactions
-            .Where(t => t.InvoiceKey == invoiceKey)
+        var query = _context.Transactions
+            .Where(t => t.InvoiceKey == invoiceKey);
+
+        if (!string.IsNullOrEmpty(category))
+            query = query.Where(t => t.Category == category);
+
+        var transactions = await query
             .OrderByDescending(t => t.Date)
             .ToListAsync();
 

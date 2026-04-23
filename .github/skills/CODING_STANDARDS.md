@@ -74,11 +74,13 @@ Não deixar linhas em branco desnecessárias nos arquivos de código.
 
 ### ✅ Correto
 - Sem linha em branco no final do arquivo
+- A última linha do arquivo deve ser uma linha com conteúdo (sem quebra de linha extra após ela)
 - Sem múltiplas linhas em branco consecutivas
 - Sem linhas em branco separando trechos que pertencem ao mesmo bloco lógico
 
 ### ❌ Errado
 - Arquivo terminando com linha em branco
+- Arquivo com quebra de linha extra após a última linha de conteúdo
 - Duas ou mais linhas em branco em sequência
 
 ### Por quê?

@@ -68,5 +68,25 @@ namespace CardLedger.Models
 
 ---
 
+## 🧹 Linhas em Branco (Obrigatório)
+
+Não deixar linhas em branco desnecessárias nos arquivos de código.
+
+### ✅ Correto
+- Sem linha em branco no final do arquivo
+- Sem múltiplas linhas em branco consecutivas
+- Sem linhas em branco separando trechos que pertencem ao mesmo bloco lógico
+
+### ❌ Errado
+- Arquivo terminando com linha em branco
+- Duas ou mais linhas em branco em sequência
+
+### Por quê?
+- **Consistência:** Padroniza a formatação entre todos os arquivos
+- **Legibilidade:** Evita ruído visual desnecessário
+- **Revisão de código:** Reduz diffs de formatação
+
+---
+
 Para mais contexto arquitetural, consulte `AGENTS.md`.
 

@@ -47,7 +47,10 @@ namespace CardLedger.Controllers
         /// Atualizar categoria de uma transação
         /// </summary>
         [HttpPatch("{id}/category")]
-        public async Task<IActionResult> UpdateCategory(int id, [FromBody] UpdateCategoryRequest request)
+        public async Task<IActionResult> UpdateCategory(
+            int id,
+            [FromBody] UpdateCategoryRequest request
+        )
         {
             if (request is null || request.CategoryId <= 0)
                 return BadRequest(new { message = "CategoryId inválido" });

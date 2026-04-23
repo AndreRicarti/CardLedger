@@ -6,7 +6,6 @@ namespace CardLedger.Services
 {
     public interface ITransactionService
     {
-        Task<List<Transaction>> FilterTransactionsAsync(int? year = null, int? month = null, string? category = null);
         Task<Transaction?> GetTransactionAsync(int id);
         Task<bool> UpdateCategoryAsync(int id, int categoryId);
         Task<bool> UpdateCategoryByInvoiceAsync(string invoiceKey, int id, int categoryId);
@@ -20,24 +19,6 @@ namespace CardLedger.Services
         public TransactionService(InvoiceDbContext context)
         {
             _context = context;
-        }
-
-        public async Task<List<Transaction>> FilterTransactionsAsync(int? year = null, int? month = null, string? category = null)
-        {
-            var query = _context.Transactions
-                .Include(t => t.CategoryEntity)
-                .AsQueryable();
-
-            if (year.HasValue)
-                query = query.Where(t => t.Year == year);
-
-            if (month.HasValue)
-                query = query.Where(t => t.Month == month);
-
-            if (!string.IsNullOrEmpty(category))
-                query = query.Where(t => t.CategoryEntity != null && t.CategoryEntity.Name == category);
-
-            return await query.OrderByDescending(t => t.Date).ToListAsync();
         }
 
         public async Task<Transaction?> GetTransactionAsync(int id)

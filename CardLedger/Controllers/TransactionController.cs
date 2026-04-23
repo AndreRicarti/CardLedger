@@ -31,19 +31,6 @@ namespace CardLedger.Controllers
         }
 
         /// <summary>
-        /// Filtrar transações por ano, mês e/ou categoria
-        /// </summary>
-        [HttpGet]
-        public async Task<ActionResult<List<Transaction>>> FilterTransactions(
-            [FromQuery] int? year = null,
-            [FromQuery] int? month = null,
-            [FromQuery] string? category = null)
-        {
-            var transactions = await _transactionService.FilterTransactionsAsync(year, month, category);
-            return Ok(transactions);
-        }
-
-        /// <summary>
         /// Obter uma transação específica
         /// </summary>
         [HttpGet("{id}")]

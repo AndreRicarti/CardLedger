@@ -26,7 +26,6 @@ public class InvoiceDbContext : DbContext
             .HasForeignKey(t => t.CategoryId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Índices para melhor performance
         modelBuilder.Entity<Transaction>()
             .HasIndex(t => new { t.Year, t.Month });
 

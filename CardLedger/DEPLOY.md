@@ -236,3 +236,12 @@ ls /app/data
 * Deploy é feito via imagens Docker (GHCR)
 * Estrutura é resiliente a perda de arquivos locais
 * Watchtower garante atualização automática
+
+---
+
+## 13. Próximos Passos (Melhorias)
+
+* Configurar proxy Nginx (`/api`)
+* Usar versionamento de imagem (evitar `latest`)
+* Configurar HTTPS (Let's Encrypt)
+* Backup automático do banco

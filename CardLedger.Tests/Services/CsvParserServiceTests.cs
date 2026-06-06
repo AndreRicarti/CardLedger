@@ -1,7 +1,7 @@
+using System.Text;
 using CardLedger.Services;
 using FluentAssertions;
 using Moq;
-using System.Text;
 using Xunit;
 
 namespace CardLedger.Tests.Services;
@@ -20,18 +20,20 @@ public sealed class CsvParserServiceTests
         _sut = new CsvParserService(_categorizationServiceMock.Object);
     }
 
-    private static Stream ToStream(string content) =>
-        new MemoryStream(Encoding.UTF8.GetBytes(content));
+    private static Stream ToStream(string content)
+    {
+        return new MemoryStream(Encoding.UTF8.GetBytes(content));
+    }
 
     [Fact]
-    public async Task ParseNubankCsvAsync_CsvValido_RetornaTransacoes()
+    public async Task ParseNubankCsvAsync_ValidCsv_ReturnsTransactions()
     {
         // Arrange
         var csv = """
-            date,title,amount
-            2024-03-15,Restaurante ABC,50.00
-            2024-03-16,Supermercado XYZ,120.50
-            """;
+                  date,title,amount
+                  2024-03-15,Restaurante ABC,50.00
+                  2024-03-16,Supermercado XYZ,120.50
+                  """;
 
         // Act
         var result = await _sut.ParseNubankCsvAsync(ToStream(csv));
@@ -46,13 +48,13 @@ public sealed class CsvParserServiceTests
     }
 
     [Fact]
-    public async Task ParseNubankCsvAsync_ValorNegativo_MarcaComoEstorno()
+    public async Task ParseNubankCsvAsync_NegativeAmount_MarksAsRefund()
     {
         // Arrange
         var csv = """
-            date,title,amount
-            2024-03-15,Estorno Restaurante,-50.00
-            """;
+                  date,title,amount
+                  2024-03-15,Estorno Restaurante,-50.00
+                  """;
 
         // Act
         var result = await _sut.ParseNubankCsvAsync(ToStream(csv));
@@ -64,7 +66,7 @@ public sealed class CsvParserServiceTests
     }
 
     [Fact]
-    public async Task ParseNubankCsvAsync_CsvApenasCabecalho_RetornaListaVazia()
+    public async Task ParseNubankCsvAsync_OnlyHeader_ReturnsEmptyList()
     {
         // Arrange
         var csv = "date,title,amount\n";
@@ -77,14 +79,14 @@ public sealed class CsvParserServiceTests
     }
 
     [Fact]
-    public async Task ParseNubankCsvAsync_LinhaInvalida_IgnoraEContinua()
+    public async Task ParseNubankCsvAsync_InvalidLine_SkipsAndContinues()
     {
         // Arrange
         var csv = """
-            date,title,amount
-            linha-invalida
-            2024-03-15,Transacao Valida,30.00
-            """;
+                  date,title,amount
+                  invalid-line
+                  2024-03-15,Transacao Valida,30.00
+                  """;
 
         // Act
         var result = await _sut.ParseNubankCsvAsync(ToStream(csv));
@@ -95,7 +97,7 @@ public sealed class CsvParserServiceTests
     }
 
     [Fact]
-    public async Task ParseNubankCsvAsync_TituloComVirgulaNasAspas_ParseCorretamente()
+    public async Task ParseNubankCsvAsync_TitleWithCommaInQuotes_ParsesCorrectly()
     {
         // Arrange
         var csv = "date,title,amount\n2024-03-15,\"Loja, com virgula\",75.00\n";
@@ -109,7 +111,7 @@ public sealed class CsvParserServiceTests
     }
 
     [Fact]
-    public async Task ParseNubankCsvAsync_NomeArquivoComData_ExtractInvoiceKeyMesAnterior()
+    public async Task ParseNubankCsvAsync_FileNameWithDate_ExtractsInvoiceKeyAsPreviousMonth()
     {
         // Arrange
         var csv = "date,title,amount\n2024-02-10,Compra,100.00\n";
@@ -123,20 +125,20 @@ public sealed class CsvParserServiceTests
     }
 
     [Fact]
-    public async Task ParseNubankCsvAsync_NomeArquivoSemData_InvoiceKeyVazia()
+    public async Task ParseNubankCsvAsync_FileNameWithoutDate_InvoiceKeyIsEmpty()
     {
         // Arrange
         var csv = "date,title,amount\n2024-02-10,Compra,100.00\n";
 
         // Act
-        var result = await _sut.ParseNubankCsvAsync(ToStream(csv), "arquivo_sem_data.csv");
+        var result = await _sut.ParseNubankCsvAsync(ToStream(csv), "file_without_date.csv");
 
         // Assert
         result[0].InvoiceKey.Should().BeEmpty();
     }
 
     [Fact]
-    public async Task ParseNubankCsvAsync_Transacao_ChamaCategorizeTransaction()
+    public async Task ParseNubankCsvAsync_Transaction_CallsCategorizeTransaction()
     {
         // Arrange
         var csv = "date,title,amount\n2024-03-15,Restaurante ABC,50.00\n";
@@ -151,7 +153,7 @@ public sealed class CsvParserServiceTests
     }
 
     [Fact]
-    public async Task ParseNubankCsvAsync_Transacao_PreencheAnoEMesCorretamente()
+    public async Task ParseNubankCsvAsync_Transaction_SetsYearAndMonthCorrectly()
     {
         // Arrange
         var csv = "date,title,amount\n2024-07-22,Compra,10.00\n";
@@ -165,18 +167,21 @@ public sealed class CsvParserServiceTests
     }
 
     [Theory]
-    [InlineData("60,00",    60.00)]   // pt-BR: vírgula como decimal
-    [InlineData("60.00",    60.00)]   // invariant: ponto como decimal
-    [InlineData("1.234,56", 1234.56)] // pt-BR: ponto como milhar, vírgula como decimal
-    [InlineData("1,234.56", 1234.56)] // en-US: vírgula como milhar, ponto como decimal
-    [InlineData("5,89",     5.89)]    // pt-BR sem milhar
-    public async Task ParseNubankCsvAsync_FormatosDeValor_ParseadosCorretamente(string valor, decimal esperado)
+    [InlineData("60,00",    60.00)]   // pt-BR: comma as decimal separator (quoted in CSV)
+    [InlineData("60.00",    60.00)]   // invariant: dot as decimal separator
+    [InlineData("1.234,56", 1234.56)] // pt-BR: dot as thousands, comma as decimal (quoted in CSV)
+    [InlineData("1,234.56", 1234.56)] // en-US: comma as thousands, dot as decimal (quoted in CSV)
+    [InlineData("5,89",     5.89)]    // pt-BR without thousands separator (quoted in CSV)
+    public async Task ParseNubankCsvAsync_AmountFormats_ParsedCorrectly(string amount, decimal expected)
     {
-        var csv = $"date,title,amount\n2024-03-15,Compra,{valor}\n";
+        // Amounts containing commas must be quoted in CSV to avoid being split as extra fields
+        var needsQuotes = amount.Contains(',');
+        var csvAmount = needsQuotes ? $"\"{amount}\"" : amount;
+        var csv = $"date,title,amount\n2024-03-15,Compra,{csvAmount}\n";
 
         var result = await _sut.ParseNubankCsvAsync(ToStream(csv));
 
         result.Should().HaveCount(1);
-        result[0].Amount.Should().Be(esperado);
+        result[0].Amount.Should().Be(expected);
     }
 }

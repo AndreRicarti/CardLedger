@@ -66,6 +66,21 @@ public sealed class CsvParserServiceTests
     }
 
     [Fact]
+    public async Task ParseNubankCsvAsync_NegativeAmountWithUnquotedComma_ParsesCorrectly()
+    {
+        // Arrange — "- 3,99" sem aspas é dividido em dois campos pelo parser CSV
+        var csv = "date,title,amount\n2026-05-30,IOF de volta de Claude.Ai Subscription,- 3,99\n";
+
+        // Act
+        var result = await _sut.ParseNubankCsvAsync(ToStream(csv));
+
+        // Assert
+        result.Should().HaveCount(1);
+        result[0].IsRefund.Should().BeTrue();
+        result[0].Amount.Should().Be(3.99m);
+    }
+
+    [Fact]
     public async Task ParseNubankCsvAsync_OnlyHeader_ReturnsEmptyList()
     {
         // Arrange
@@ -76,6 +91,22 @@ public sealed class CsvParserServiceTests
 
         // Assert
         result.Should().BeEmpty();
+    }
+
+    [Theory]
+    [InlineData("Pagamento recebido")]
+    [InlineData("Valor pendente do mês anterior")]
+    public async Task ParseNubankCsvAsync_IgnoredTitle_SkipsTransaction(string title)
+    {
+        // Arrange
+        var csv = $"date,title,amount\n2024-03-15,{title},100.00\n2024-03-16,Compra Normal,50.00\n";
+
+        // Act
+        var result = await _sut.ParseNubankCsvAsync(ToStream(csv));
+
+        // Assert
+        result.Should().HaveCount(1);
+        result[0].Title.Should().Be("Compra Normal");
     }
 
     [Fact]

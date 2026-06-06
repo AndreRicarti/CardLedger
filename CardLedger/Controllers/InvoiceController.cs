@@ -42,6 +42,16 @@ public class InvoiceController(
         }
     }
 
+    [HttpGet("key/{invoiceKey}/summary")]
+    public async Task<ActionResult<InvoiceSummary>> GetInvoiceSummary(string invoiceKey)
+    {
+        var summary = await invoiceService.GetInvoiceSummaryByKeyAsync(invoiceKey);
+
+        return summary is null
+            ? NotFound(new { message = "Nenhuma fatura encontrada para esta chave" })
+            : Ok(summary);
+    }
+
     [HttpGet("key/{invoiceKey}/transactions-by-category")]
     public async Task<ActionResult<List<TransactionsByCategoryResponse>>> GetTransactionsByCategory(string invoiceKey, [FromQuery] string? category = null)
     {

@@ -6,6 +6,7 @@ namespace CardLedger.Services;
 
 public interface IInvoiceService
 {
+    Task<InvoiceSummary?> GetInvoiceSummaryByKeyAsync(string invoiceKey);
     Task<List<TransactionsByCategoryResponse>?> GetTransactionsByCategoryAsync(string invoiceKey, string? category = null);
     Task<int> ImportTransactionsAsync(List<Transaction> transactions);
 }
@@ -17,6 +18,49 @@ public sealed class InvoiceService : IInvoiceService
     public InvoiceService(InvoiceDbContext context)
     {
         _context = context;
+    }
+
+    public async Task<InvoiceSummary?> GetInvoiceSummaryByKeyAsync(string invoiceKey)
+    {
+        var transactions = await _context.Transactions
+            .Include(t => t.CategoryEntity)
+            .Where(t => t.InvoiceKey == invoiceKey)
+            .ToListAsync();
+
+        if (!transactions.Any())
+            return null;
+
+        var parts = invoiceKey.Split('-');
+        var year = int.TryParse(parts[0], out var y) ? y : DateTime.Now.Year;
+        var month = int.TryParse(parts[1], out var m) ? m : 1;
+
+        var totalSpent = transactions.Where(t => !t.IsRefund).Sum(t => t.Amount);
+
+        var categories = transactions
+            .Where(t => !t.IsRefund)
+            .GroupBy(t => t.CategoryEntity?.Name ?? "Não Categorizado")
+            .Select(g => new CategorySummary
+            {
+                Category = g.Key,
+                Amount = g.Sum(t => t.Amount),
+                Percentage = totalSpent > 0 ? Math.Round(g.Sum(t => t.Amount) / totalSpent * 100, 2) : 0
+            })
+            .OrderByDescending(c => c.Amount)
+            .ToList();
+
+        var date = new DateTime(year, month, 1);
+        var monthName = date.ToString("MMMM yyyy", new System.Globalization.CultureInfo("pt-BR"));
+
+        return new InvoiceSummary
+        {
+            InvoiceKey = invoiceKey,
+            MonthName = monthName,
+            TotalSpent = totalSpent,
+            TotalRefunds = transactions.Where(t => t.IsRefund).Sum(t => t.Amount),
+            NetTotal = totalSpent - transactions.Where(t => t.IsRefund).Sum(t => t.Amount),
+            TransactionCount = transactions.Count,
+            Categories = categories
+        };
     }
 
     public async Task<List<TransactionsByCategoryResponse>?> GetTransactionsByCategoryAsync(

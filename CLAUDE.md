@@ -45,6 +45,7 @@ Two projects: `CardLedger` (Web API) and `CardLedger.Tests` (xUnit).
 - All models and services use `sealed`
 - File-scoped namespaces (`namespace CardLedger.Models;`)
 - Tests use `InMemory` EF provider (not PostgreSQL)
+- **Sempre executar `dotnet build` após qualquer alteração para garantir que não há erros de compilação antes de finalizar.**
 - **Todo novo código ou alteração de lógica existente deve ter testes unitários correspondentes.** Testes ficam em `CardLedger.Tests`, espelhando a estrutura do projeto principal (ex: `Helpers/DecimalParserTests.cs`, `Services/InvoiceServiceTests.cs`)
 - **Nomes de testes sempre em inglês**, seguindo o padrão `MethodName_Scenario_ExpectedResult` (ex: `ParseNubankCsvAsync_NegativeAmount_MarksAsRefund`)
 

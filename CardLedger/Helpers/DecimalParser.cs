@@ -6,11 +6,12 @@ public static class DecimalParser
 {
     /// <summary>
     /// Parseia valores decimais nos formatos pt-BR e en-US.
-    /// Suporta: "60,00" → 60, "60.00" → 60, "1.234,56" → 1234.56, "1,234.56" → 1234.56
+    /// Suporta: "60,00" → 60, "60.00" → 60, "1.234,56" → 1234.56, "1,234.56" → 1234.56, "- 3,99" → -3.99
     /// </summary>
     public static bool TryParseAmount(string value, out decimal result)
     {
-        var normalized = value.Trim();
+        // Remove espaços internos após o sinal negativo: "- 3,99" → "-3,99"
+        var normalized = value.Trim().Replace("- ", "-");
 
         var lastDot   = normalized.LastIndexOf('.');
         var lastComma = normalized.LastIndexOf(',');

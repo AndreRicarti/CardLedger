@@ -31,12 +31,20 @@ public sealed class CsvParserService(ICategorizationService categorizationServic
             if (parts.Count < 3)
                 continue;
 
-            if (!DateOnly.TryParse(parts[0], out var date) ||
-                !DecimalParser.TryParseAmount(parts[2], out var amount)) continue;
+            if (!DateOnly.TryParse(parts[0], out var date)) continue;
+
+            // Valores com vírgula decimal não cotados no CSV são divididos em campos extras
+            // ex: "- 3,99" → parts[2]="- 3", parts[3]="99" → recombina para "- 3,99"
+            var rawAmount = parts.Count > 3
+                ? string.Join(",", parts.Skip(2))
+                : parts[2];
+
+            if (!DecimalParser.TryParseAmount(rawAmount, out var amount)) continue;
 
             var title = parts[1];
 
-            if (title.Equals("Pagamento recebido", StringComparison.OrdinalIgnoreCase))
+            if (title.Equals("Pagamento recebido", StringComparison.OrdinalIgnoreCase) ||
+                title.Equals("Valor pendente do mês anterior", StringComparison.OrdinalIgnoreCase))
                 continue;
 
             var isRefund = amount < 0;

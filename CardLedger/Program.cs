@@ -9,10 +9,8 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
 
-// SQLite aponta para o volume montado em /app/data
-var dbPath = Path.Combine("data", "invoices.db");
 builder.Services.AddDbContext<InvoiceDbContext>(options =>
-    options.UseSqlite($"Data Source={dbPath}"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Registrar serviços
 builder.Services.AddScoped<ICategorizationService, CategorizationService>();
@@ -22,19 +20,9 @@ builder.Services.AddScoped<ICsvParserService, CsvParserService>();
 
 var app = builder.Build();
 
-// Reset controlado do banco: recria apenas uma vez (quando ainda não estiver normalizado)
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<InvoiceDbContext>();
-
-    var appliedMigrations = (await db.Database.GetAppliedMigrationsAsync()).ToHashSet(StringComparer.OrdinalIgnoreCase);
-    var isNormalized = appliedMigrations.Contains("20260421225427_NormalizeCategories");
-
-    if (!isNormalized)
-    {
-        await db.Database.EnsureDeletedAsync();
-    }
-
     await db.Database.MigrateAsync();
 }
 

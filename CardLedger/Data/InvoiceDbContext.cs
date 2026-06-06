@@ -3,12 +3,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CardLedger.Data;
 
-public class InvoiceDbContext : DbContext
+public class InvoiceDbContext(DbContextOptions<InvoiceDbContext> options) : DbContext(options)
 {
-    public InvoiceDbContext(DbContextOptions<InvoiceDbContext> options) : base(options)
-    {
-    }
-
     public DbSet<Transaction> Transactions { get; set; }
     public DbSet<Category> Categories { get; set; }
 

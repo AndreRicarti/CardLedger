@@ -1,7 +1,7 @@
 # CardLedger — CI/CD e Deploy no ZimaOS
 
-**Data:** Maio 2026
-**Projeto:** CardLedger Web API (.NET 10 + SQLite)
+**Data:** Junho 2026
+**Projeto:** CardLedger Web API (.NET 10 + PostgreSQL)
 **Repositório:** https://github.com/AndreRicarti/CardLedger
 
 ---
@@ -29,7 +29,7 @@ ZimaOS (/DATA/Backup/projects/invoice)
 ## 2. Tecnologias Utilizadas
 
 * .NET 10 (API)
-* SQLite (persistência)
+* PostgreSQL (persistência, via Npgsql + EF Core)
 * React + Vite (frontend)
 * Docker + Docker Compose
 * GitHub Actions (CI/CD)
@@ -86,8 +86,6 @@ services:
     container_name: cardledger-api
     ports:
       - "7086:8080"
-    volumes:
-      - api-data:/app/data
     restart: unless-stopped
 
   frontend:
@@ -108,9 +106,6 @@ services:
       - WATCHTOWER_POLL_INTERVAL=300
       - WATCHTOWER_CLEANUP=true
     restart: unless-stopped
-
-volumes:
-  api-data:
 ```
 
 ---
@@ -193,27 +188,22 @@ Permite:
 
 ---
 
-## 10. Banco de Dados (SQLite)
+## 10. Banco de Dados (PostgreSQL)
 
-Local:
+| Ambiente    | Banco            |
+|-------------|------------------|
+| Produção    | `card_ledger`    |
+| Desenvolvimento | `card_ledger_dev` |
 
-```text
-/app/data/invoices.db
-```
-
-Persistido via volume Docker:
-
-```text
-api-data
-```
+A connection string é configurada em `appsettings.json` (produção) e `appsettings.Development.json` (desenvolvimento). As migrations são aplicadas automaticamente na inicialização da API via `MigrateAsync()`.
 
 ---
 
-### Inspeção:
+### Criar bancos (primeira vez):
 
-```sh
-sudo docker exec -it invoice-api-1 sh
-ls /app/data
+```sql
+CREATE DATABASE card_ledger;
+CREATE DATABASE card_ledger_dev;
 ```
 
 ---
@@ -244,4 +234,4 @@ ls /app/data
 * Configurar proxy Nginx (`/api`)
 * Usar versionamento de imagem (evitar `latest`)
 * Configurar HTTPS (Let's Encrypt)
-* Backup automático do banco
+* Backup automático do banco PostgreSQL

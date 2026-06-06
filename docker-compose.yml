@@ -4,8 +4,6 @@ services:
     image: ghcr.io/andrericarti/cardledger-api:latest
     ports:
       - "7086:8080"
-    volumes:
-      - api-data:/app/data
     restart: unless-stopped
 
   frontend:
@@ -26,6 +24,3 @@ services:
       - WATCHTOWER_POLL_INTERVAL=300
       - WATCHTOWER_CLEANUP=true
     restart: unless-stopped
-
-volumes:
-  api-data:

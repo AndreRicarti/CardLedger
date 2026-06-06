@@ -14,9 +14,6 @@ WORKDIR /app
 
 COPY --from=build /app/publish ./
 
-# Garante que o diretório de dados existe
-RUN mkdir -p /app/data
-
 ENV ASPNETCORE_URLS=http://+:8080
 ENV ASPNETCORE_ENVIRONMENT=Production
 

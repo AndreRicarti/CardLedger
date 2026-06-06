@@ -4,11 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CardLedger.Controllers;
 
-public sealed class UpdateCategoryRequest
-{
-    public int CategoryId { get; set; }
-}
-
 [ApiController]
 [Route("api/[controller]")]
 public class TransactionController(ITransactionService transactionService) : ControllerBase

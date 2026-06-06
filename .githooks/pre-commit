@@ -1,0 +1,23 @@
+#!/bin/sh
+# Auto-incrementa o patch version no CardLedger.csproj a cada commit
+
+CSPROJ="CardLedger/CardLedger.csproj"
+
+CURRENT=$(grep -oP '(?<=<Version>)[^<]+' "$CSPROJ")
+
+if [ -z "$CURRENT" ]; then
+  echo "⚠️  <Version> não encontrado em $CSPROJ — pulando bump."
+  exit 0
+fi
+
+MAJOR=$(echo "$CURRENT" | cut -d. -f1)
+MINOR=$(echo "$CURRENT" | cut -d. -f2)
+PATCH=$(echo "$CURRENT" | cut -d. -f3)
+NEW_PATCH=$((PATCH + 1))
+NEW_VERSION="$MAJOR.$MINOR.$NEW_PATCH"
+
+sed -i "s|<Version>$CURRENT</Version>|<Version>$NEW_VERSION</Version>|" "$CSPROJ"
+
+git add "$CSPROJ"
+
+echo "🔖 Version: $CURRENT → $NEW_VERSION"

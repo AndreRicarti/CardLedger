@@ -1,3 +1,4 @@
+using System.Reflection;
 using CardLedger.Data;
 using CardLedger.Services;
 using Microsoft.EntityFrameworkCore;
@@ -5,9 +6,16 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
+var version = (Assembly.GetExecutingAssembly()
+    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "1.0.0")
+    .Split('+')[0];
+
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new() { Title = "CardLedger", Version = version });
+});
 
 builder.Services.AddDbContext<InvoiceDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -31,7 +39,7 @@ app.MapOpenApi();
 app.UseSwagger();
 app.UseSwaggerUI(options =>
 {
-    options.SwaggerEndpoint("/swagger/v1/swagger.json", "CardLedger API v2");
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", $"CardLedger {version}");
     options.RoutePrefix = string.Empty;
 });
 

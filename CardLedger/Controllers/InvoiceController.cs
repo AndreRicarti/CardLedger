@@ -53,14 +53,4 @@ public class InvoiceController(
         return Ok(result);
     }
 
-    [HttpGet("{year}/{month}")]
-    public async Task<ActionResult<MonthlyInvoice>> GetMonthlyInvoice(int year, int month)
-    {
-        var invoiceKey = $"{year}-{month:D2}";
-        var invoice = await invoiceService.GetInvoiceByKeyAsync(invoiceKey);
-        if (invoice == null)
-            return NotFound(new { message = "Nenhuma fatura encontrada para este mês" });
-
-        return Ok(invoice);
-    }
 }

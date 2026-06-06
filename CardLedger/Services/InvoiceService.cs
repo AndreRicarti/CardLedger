@@ -1,13 +1,11 @@
 using CardLedger.Data;
 using CardLedger.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Globalization;
 
 namespace CardLedger.Services;
 
 public interface IInvoiceService
 {
-    Task<MonthlyInvoice?> GetInvoiceByKeyAsync(string invoiceKey);
     Task<List<TransactionsByCategoryResponse>?> GetTransactionsByCategoryAsync(string invoiceKey, string? category = null);
     Task<int> ImportTransactionsAsync(List<Transaction> transactions);
 }
@@ -19,33 +17,6 @@ public sealed class InvoiceService : IInvoiceService
     public InvoiceService(InvoiceDbContext context)
     {
         _context = context;
-    }
-
-    public async Task<MonthlyInvoice?> GetInvoiceByKeyAsync(string invoiceKey)
-    {
-        var transactions = await _context.Transactions
-            .Include(t => t.CategoryEntity)
-            .Where(t => t.InvoiceKey == invoiceKey)
-            .ToListAsync();
-
-        if (!transactions.Any())
-            return null;
-
-        var parts = invoiceKey.Split('-');
-        var year = int.TryParse(parts[0], out var y) ? y : DateTime.Now.Year;
-        var month = int.TryParse(parts[1], out var m) ? m : 1;
-
-        return new MonthlyInvoice
-        {
-            Year = year,
-            Month = month,
-            InvoiceKey = invoiceKey,
-            MonthName = GetMonthName(year, month),
-            TotalSpent = transactions.Where(t => !t.IsRefund).Sum(t => t.Amount),
-            TotalRefunds = transactions.Where(t => t.IsRefund).Sum(t => t.Amount),
-            NetTotal = transactions.Where(t => !t.IsRefund).Sum(t => t.Amount) - transactions.Where(t => t.IsRefund).Sum(t => t.Amount),
-            TransactionCount = transactions.Count()
-        };
     }
 
     public async Task<List<TransactionsByCategoryResponse>?> GetTransactionsByCategoryAsync(
@@ -121,10 +92,4 @@ public sealed class InvoiceService : IInvoiceService
         return transactions.Count;
     }
 
-    private string GetMonthName(int year, int month)
-    {
-        var date = new DateTime(year, month, 1);
-        var culture = new CultureInfo("pt-BR");
-        return date.ToString("MMMM yyyy", culture);
-    }
 }

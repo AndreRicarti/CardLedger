@@ -32,57 +32,6 @@ public sealed class InvoiceServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task GetInvoiceByKeyAsync_ChaveExistente_RetornaMonthlyInvoice()
-    {
-        // Arrange
-        await SeedTransactionsAsync([
-            BuildTransaction("2024-03", "Restaurante", 100m, isRefund: false),
-            BuildTransaction("2024-03", "Supermercado", 200m, isRefund: false),
-        ]);
-
-        // Act
-        var result = await _sut.GetInvoiceByKeyAsync("2024-03");
-
-        // Assert
-        result.Should().NotBeNull();
-        result!.InvoiceKey.Should().Be("2024-03");
-        result.TotalSpent.Should().Be(300m);
-        result.TotalRefunds.Should().Be(0m);
-        result.NetTotal.Should().Be(300m);
-        result.TransactionCount.Should().Be(2);
-        result.Year.Should().Be(2024);
-        result.Month.Should().Be(3);
-    }
-
-    [Fact]
-    public async Task GetInvoiceByKeyAsync_ComEstorno_CalculaTotaisCorretamente()
-    {
-        // Arrange
-        await SeedTransactionsAsync([
-            BuildTransaction("2024-03", "Compra", 200m, isRefund: false),
-            BuildTransaction("2024-03", "Estorno Compra", 50m, isRefund: true),
-        ]);
-
-        // Act
-        var result = await _sut.GetInvoiceByKeyAsync("2024-03");
-
-        // Assert
-        result!.TotalSpent.Should().Be(200m);
-        result.TotalRefunds.Should().Be(50m);
-        result.NetTotal.Should().Be(150m);
-    }
-
-    [Fact]
-    public async Task GetInvoiceByKeyAsync_ChaveInexistente_RetornaNull()
-    {
-        // Act
-        var result = await _sut.GetInvoiceByKeyAsync("2099-01");
-
-        // Assert
-        result.Should().BeNull();
-    }
-
-    [Fact]
     public async Task GetTransactionsByCategoryAsync_ChaveExistente_AgrupaPorCategoria()
     {
         // Arrange

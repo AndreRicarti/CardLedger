@@ -83,37 +83,6 @@ public sealed class InvoiceServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task GetInvoiceSummaryByKeyAsync_ChaveExistente_RetornaResumoComCategorias()
-    {
-        // Arrange
-        await SeedTransactionsAsync([
-            BuildTransaction("2024-03", "Restaurante", 100m, category: "Alimentação"),
-            BuildTransaction("2024-03", "Uber", 50m, category: "Transporte"),
-        ]);
-
-        // Act
-        var result = await _sut.GetInvoiceSummaryByKeyAsync("2024-03");
-
-        // Assert
-        result.Should().NotBeNull();
-        result!.TotalSpent.Should().Be(150m);
-        result.Categories.Should().HaveCount(2);
-        result.Categories[0].Category.Should().Be("Alimentação");
-        result.Categories[0].Amount.Should().Be(100m);
-        result.Categories[0].Percentage.Should().BeApproximately(66.67m, 0.01m);
-    }
-
-    [Fact]
-    public async Task GetInvoiceSummaryByKeyAsync_ChaveInexistente_RetornaNull()
-    {
-        // Act
-        var result = await _sut.GetInvoiceSummaryByKeyAsync("2099-01");
-
-        // Assert
-        result.Should().BeNull();
-    }
-
-    [Fact]
     public async Task GetTransactionsByCategoryAsync_ChaveExistente_AgrupaPorCategoria()
     {
         // Arrange

@@ -22,7 +22,7 @@ public class InvoiceController(
 
         try
         {
-            using var stream = file.OpenReadStream();
+            await using var stream = file.OpenReadStream();
 
             var transactions = await csvParserService.ParseNubankCsvAsync(stream, file.FileName);
 
@@ -40,16 +40,6 @@ public class InvoiceController(
         {
             return BadRequest(new { message = ex.Message });
         }
-    }
-
-    [HttpGet("key/{invoiceKey}/summary")]
-    public async Task<ActionResult<InvoiceSummary>> GetInvoiceSummary(string invoiceKey)
-    {
-        var summary = await invoiceService.GetInvoiceSummaryByKeyAsync(invoiceKey);
-        if (summary == null)
-            return NotFound(new { message = "Nenhuma fatura encontrada para esta chave" });
-
-        return Ok(summary);
     }
 
     [HttpGet("key/{invoiceKey}/transactions-by-category")]

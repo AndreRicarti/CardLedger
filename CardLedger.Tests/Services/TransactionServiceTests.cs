@@ -26,32 +26,6 @@ public sealed class TransactionServiceTests : IDisposable
     public void Dispose() => _context.Dispose();
 
     [Fact]
-    public async Task GetTransactionAsync_IdExistente_RetornaTransacao()
-    {
-        // Arrange
-        var transaction = BuildTransaction(2024, 3, "Alimentação");
-        _context.Transactions.Add(transaction);
-        await _context.SaveChangesAsync();
-
-        // Act
-        var result = await _sut.GetTransactionAsync(transaction.Id);
-
-        // Assert
-        result.Should().NotBeNull();
-        result!.Id.Should().Be(transaction.Id);
-    }
-
-    [Fact]
-    public async Task GetTransactionAsync_IdInexistente_RetornaNull()
-    {
-        // Act
-        var result = await _sut.GetTransactionAsync(9999);
-
-        // Assert
-        result.Should().BeNull();
-    }
-
-    [Fact]
     public async Task UpdateCategoryAsync_IdExistente_AtualizaCategoriaERetornaTrue()
     {
         // Arrange

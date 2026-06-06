@@ -20,15 +20,6 @@ public class TransactionController(ITransactionService transactionService) : Con
         return Ok(categories);
     }
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult<Transaction>> GetTransaction(int id)
-    {
-        var transaction = await transactionService.GetTransactionAsync(id);
-        return transaction is null
-            ? NotFound(new { message = "Transação não encontrada" })
-            : Ok(transaction);
-    }
-
     [HttpPatch("{id:int}/category")]
     public async Task<IActionResult> UpdateCategory(
         int id,

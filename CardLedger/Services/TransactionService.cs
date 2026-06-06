@@ -6,7 +6,6 @@ namespace CardLedger.Services;
 
 public interface ITransactionService
 {
-    Task<Transaction?> GetTransactionAsync(int id);
     Task<bool> UpdateCategoryAsync(int id, int categoryId);
     Task<List<CategoryOption>> GetCategoriesAsync();
 }
@@ -18,13 +17,6 @@ public sealed class TransactionService : ITransactionService
     public TransactionService(InvoiceDbContext context)
     {
         _context = context;
-    }
-
-    public async Task<Transaction?> GetTransactionAsync(int id)
-    {
-        return await _context.Transactions
-            .Include(t => t.CategoryEntity)
-            .FirstOrDefaultAsync(t => t.Id == id);
     }
 
     public async Task<bool> UpdateCategoryAsync(int id, int categoryId)

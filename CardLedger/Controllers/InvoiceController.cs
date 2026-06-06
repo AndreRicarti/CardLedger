@@ -6,22 +6,11 @@ namespace CardLedger.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class InvoiceController : ControllerBase
+public class InvoiceController(
+    IInvoiceService invoiceService,
+    ICsvParserService csvParserService)
+    : ControllerBase
 {
-    private readonly IInvoiceService _invoiceService;
-    private readonly ICsvParserService _csvParserService;
-    private readonly ITransactionService _transactionService;
-
-    public InvoiceController(IInvoiceService invoiceService, ICsvParserService csvParserService, ITransactionService transactionService)
-    {
-        _invoiceService = invoiceService;
-        _csvParserService = csvParserService;
-        _transactionService = transactionService;
-    }
-
-    /// <summary>
-    /// Importar fatura CSV do Nubank
-    /// </summary>
     [HttpPost("import")]
     public async Task<ActionResult<ImportResponse>> ImportInvoice([FromQuery] string source = "nubank", IFormFile? file = null)
     {
@@ -35,9 +24,9 @@ public class InvoiceController : ControllerBase
         {
             using var stream = file.OpenReadStream();
 
-            var transactions = await _csvParserService.ParseNubankCsvAsync(stream, file.FileName);
+            var transactions = await csvParserService.ParseNubankCsvAsync(stream, file.FileName);
 
-            var imported = await _invoiceService.ImportTransactionsAsync(transactions);
+            var imported = await invoiceService.ImportTransactionsAsync(transactions);
 
             var invoiceKeys = transactions
                 .Where(t => !string.IsNullOrEmpty(t.InvoiceKey))
@@ -53,26 +42,20 @@ public class InvoiceController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Summary da fatura por InvoiceKey com breakdown por categoria
-    /// </summary>
     [HttpGet("key/{invoiceKey}/summary")]
     public async Task<ActionResult<InvoiceSummary>> GetInvoiceSummary(string invoiceKey)
     {
-        var summary = await _invoiceService.GetInvoiceSummaryByKeyAsync(invoiceKey);
+        var summary = await invoiceService.GetInvoiceSummaryByKeyAsync(invoiceKey);
         if (summary == null)
             return NotFound(new { message = "Nenhuma fatura encontrada para esta chave" });
 
         return Ok(summary);
     }
 
-    /// <summary>
-    /// Transações de uma fatura agrupadas por categoria
-    /// </summary>
     [HttpGet("key/{invoiceKey}/transactions-by-category")]
     public async Task<ActionResult<List<TransactionsByCategoryResponse>>> GetTransactionsByCategory(string invoiceKey, [FromQuery] string? category = null)
     {
-        var result = await _invoiceService.GetTransactionsByCategoryAsync(invoiceKey, category);
+        var result = await invoiceService.GetTransactionsByCategoryAsync(invoiceKey, category);
 
         if (result == null)
             return NotFound(new { message = "Nenhuma transação encontrada para esta chave" });
@@ -80,14 +63,11 @@ public class InvoiceController : ControllerBase
         return Ok(result);
     }
 
-    /// <summary>
-    /// Fatura de um mês específico
-    /// </summary>
     [HttpGet("{year}/{month}")]
     public async Task<ActionResult<MonthlyInvoice>> GetMonthlyInvoice(int year, int month)
     {
         var invoiceKey = $"{year}-{month:D2}";
-        var invoice = await _invoiceService.GetInvoiceByKeyAsync(invoiceKey);
+        var invoice = await invoiceService.GetInvoiceByKeyAsync(invoiceKey);
         if (invoice == null)
             return NotFound(new { message = "Nenhuma fatura encontrada para este mês" });
 

@@ -1,10 +1,5 @@
 namespace CardLedger.Services;
 
-public interface ICategorizationService
-{
-    string CategorizeTransaction(string title);
-}
-
 public sealed class CategorizationService : ICategorizationService
 {
     private readonly Dictionary<string, (string category, int priority)> _keywordRules;

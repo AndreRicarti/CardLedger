@@ -15,6 +15,16 @@ public class TransactionController(ITransactionService transactionService) : Con
         return Ok(categories);
     }
 
+    [HttpDelete("{invoiceKey}")]
+    public async Task<IActionResult> DeleteByInvoiceKey(string invoiceKey)
+    {
+        var deleted = await transactionService.DeleteByInvoiceKeyAsync(invoiceKey);
+
+        return deleted
+            ? Ok(new { message = "Transações excluídas com sucesso" })
+            : NotFound(new { message = "Nenhuma transação encontrada para este InvoiceKey" });
+    }
+
     [HttpPatch("{id:int}/category")]
     public async Task<IActionResult> UpdateCategory(
         int id,

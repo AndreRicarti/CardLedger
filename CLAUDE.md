@@ -38,10 +38,14 @@ Two projects: `CardLedger` (Web API) and `CardLedger.Tests` (xUnit).
 - `Transaction` — has a persisted `CategoryId` FK and `[NotMapped]` `Category`/`CategoryName` string properties used only during CSV parsing before the FK is resolved
 - `Category` — 12 categories seeded via `HasData` in `InvoiceDbContext.OnModelCreating`
 
+**Helpers:**
+- `DecimalParser` (`Helpers/DecimalParser.cs`) — normaliza e parseia valores decimais em formato pt-BR (`60,00`) e en-US (`60.00`) antes de converter para `decimal`
+
 **Key conventions:**
 - All models and services use `sealed`
 - File-scoped namespaces (`namespace CardLedger.Models;`)
 - Tests use `InMemory` EF provider (not PostgreSQL)
+- **Todo novo código ou alteração de lógica existente deve ter testes unitários correspondentes.** Testes ficam em `CardLedger.Tests`, espelhando a estrutura do projeto principal (ex: `Helpers/DecimalParserTests.cs`, `Services/InvoiceServiceTests.cs`)
 
 ## CI/CD
 

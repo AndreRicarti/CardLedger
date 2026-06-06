@@ -163,4 +163,20 @@ public sealed class CsvParserServiceTests
         result[0].Year.Should().Be(2024);
         result[0].Month.Should().Be(7);
     }
+
+    [Theory]
+    [InlineData("60,00",    60.00)]   // pt-BR: vírgula como decimal
+    [InlineData("60.00",    60.00)]   // invariant: ponto como decimal
+    [InlineData("1.234,56", 1234.56)] // pt-BR: ponto como milhar, vírgula como decimal
+    [InlineData("1,234.56", 1234.56)] // en-US: vírgula como milhar, ponto como decimal
+    [InlineData("5,89",     5.89)]    // pt-BR sem milhar
+    public async Task ParseNubankCsvAsync_FormatosDeValor_ParseadosCorretamente(string valor, decimal esperado)
+    {
+        var csv = $"date,title,amount\n2024-03-15,Compra,{valor}\n";
+
+        var result = await _sut.ParseNubankCsvAsync(ToStream(csv));
+
+        result.Should().HaveCount(1);
+        result[0].Amount.Should().Be(esperado);
+    }
 }

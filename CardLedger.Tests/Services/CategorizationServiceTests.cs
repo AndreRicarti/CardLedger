@@ -21,6 +21,8 @@ public sealed class CategorizationServiceTests
     [InlineData("99 corrida", "Transporte")]
     [InlineData("Github Pro", "Assinaturas & Contas")]
     [InlineData("compra avulsa marketplace", "Compras Avulsas")]
+    [InlineData("Aliexpress", "Compras Avulsas")]
+    [InlineData("ALIEXPRESS*Produto123", "Compras Avulsas")]
     [InlineData("pagamento terceiros", "Terceiros")]
     [InlineData("posto de gasolina", "Transporte")]
     [InlineData("youtube premium", "Assinaturas & Contas")]

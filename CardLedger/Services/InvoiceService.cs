@@ -11,18 +11,11 @@ public interface IInvoiceService
     Task<int> ImportTransactionsAsync(List<Transaction> transactions);
 }
 
-public sealed class InvoiceService : IInvoiceService
+public sealed class InvoiceService(InvoiceDbContext context) : IInvoiceService
 {
-    private readonly InvoiceDbContext _context;
-
-    public InvoiceService(InvoiceDbContext context)
-    {
-        _context = context;
-    }
-
     public async Task<InvoiceSummary?> GetInvoiceSummaryByKeyAsync(string invoiceKey)
     {
-        var transactions = await _context.Transactions
+        var transactions = await context.Transactions
             .Include(t => t.CategoryEntity)
             .Where(t => t.InvoiceKey == invoiceKey)
             .ToListAsync();
@@ -67,7 +60,7 @@ public sealed class InvoiceService : IInvoiceService
         string invoiceKey,
         string? category = null)
     {
-        var query = _context.Transactions
+        var query = context.Transactions
             .Include(t => t.CategoryEntity)
             .Where(t => t.InvoiceKey == invoiceKey);
 
@@ -96,7 +89,8 @@ public sealed class InvoiceService : IInvoiceService
 
     public async Task<int> ImportTransactionsAsync(List<Transaction> transactions)
     {
-        var categories = await _context.Categories.ToListAsync();
+        var categories = await context.Categories.ToListAsync();
+
         var categoryMap = categories
             .GroupBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
             .ToDictionary(g => g.Key, g => g.First().Id, StringComparer.OrdinalIgnoreCase);
@@ -122,16 +116,16 @@ public sealed class InvoiceService : IInvoiceService
 
         if (invoiceKeys.Any())
         {
-            var existing = await _context.Transactions
+            var existing = await context.Transactions
                 .Where(t => invoiceKeys.Contains(t.InvoiceKey!))
                 .ToListAsync();
 
             if (existing.Any())
-                _context.Transactions.RemoveRange(existing);
+                context.Transactions.RemoveRange(existing);
         }
 
-        _context.Transactions.AddRange(transactions);
-        await _context.SaveChangesAsync();
+        context.Transactions.AddRange(transactions);
+        await context.SaveChangesAsync();
 
         return transactions.Count;
     }

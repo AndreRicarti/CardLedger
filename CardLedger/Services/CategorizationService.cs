@@ -335,6 +335,7 @@ public sealed class CategorizationService : ICategorizationService
             { "gearbest", ("Compras Online", 9) },
 
             // Compras Avulsas
+            { "aliexpress", ("Compras Avulsas", 10) },
             { "compra avulsa", ("Compras Avulsas", 10) },
             { "compras avulsas", ("Compras Avulsas", 10) },
 

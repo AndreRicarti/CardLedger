@@ -8,7 +8,6 @@ public interface ITransactionService
 {
     Task<Transaction?> GetTransactionAsync(int id);
     Task<bool> UpdateCategoryAsync(int id, int categoryId);
-    Task<bool> UpdateCategoryByInvoiceAsync(string invoiceKey, int id, int categoryId);
     Task<List<CategoryOption>> GetCategoriesAsync();
 }
 
@@ -31,23 +30,6 @@ public sealed class TransactionService : ITransactionService
     public async Task<bool> UpdateCategoryAsync(int id, int categoryId)
     {
         var transaction = await _context.Transactions.FindAsync(id);
-        if (transaction == null)
-            return false;
-
-        var categoryExists = await _context.Categories.AnyAsync(c => c.Id == categoryId);
-        if (!categoryExists)
-            return false;
-
-        transaction.CategoryId = categoryId;
-        await _context.SaveChangesAsync();
-        return true;
-    }
-
-    public async Task<bool> UpdateCategoryByInvoiceAsync(string invoiceKey, int id, int categoryId)
-    {
-        var transaction = await _context.Transactions
-            .FirstOrDefaultAsync(t => t.Id == id && t.InvoiceKey == invoiceKey);
-
         if (transaction == null)
             return false;
 

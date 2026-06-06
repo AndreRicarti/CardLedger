@@ -4,11 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CardLedger.Controllers;
 
-public sealed class UpdateTransactionCategoryRequest
-{
-    public int CategoryId { get; set; }
-}
-
 [ApiController]
 [Route("api/[controller]")]
 public class InvoiceController : ControllerBase
@@ -56,22 +51,6 @@ public class InvoiceController : ControllerBase
         {
             return BadRequest(new { message = ex.Message });
         }
-    }
-
-    /// <summary>
-    /// Alterar a categoria de uma transação de uma fatura específica
-    /// </summary>
-    [HttpPatch("key/{invoiceKey}/transactions/{id}/category")]
-    public async Task<IActionResult> UpdateTransactionCategory(string invoiceKey, int id, [FromBody] UpdateTransactionCategoryRequest request)
-    {
-        if (request is null || request.CategoryId <= 0)
-            return BadRequest(new { message = "CategoryId inválido" });
-
-        var updated = await _transactionService.UpdateCategoryByInvoiceAsync(invoiceKey, id, request.CategoryId);
-        if (!updated)
-            return NotFound(new { message = "Transação ou categoria não encontrada para esta fatura" });
-
-        return Ok(new { message = "Categoria atualizada com sucesso" });
     }
 
     /// <summary>

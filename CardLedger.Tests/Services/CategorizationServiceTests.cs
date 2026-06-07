@@ -75,6 +75,8 @@ public sealed class CategorizationServiceTests
     [InlineData("Emporio Rei do Norte", "Alimentação")]
     [InlineData("Ifd*Nb Point Acai", "Alimentação")]
     [InlineData("Ifd*Pastel do Vini", "Alimentação")]
+    [InlineData("Pao de Acucar", "Alimentação")]
+    [InlineData("Pão de Açúcar Unidade 12", "Alimentação")]
     public void CategorizeTransaction_TituloConhecido_RetornaCategoriaCerta(string title, string expectedCategory)
     {
         // Act

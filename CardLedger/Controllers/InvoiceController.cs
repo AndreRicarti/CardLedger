@@ -12,7 +12,8 @@ public class InvoiceController(
     : ControllerBase
 {
     [HttpPost("import")]
-    public async Task<ActionResult<ImportResponse>> ImportInvoice([FromQuery] string source = "nubank", IFormFile? file = null)
+    public async Task<ActionResult<ImportResponse>> ImportInvoice(
+        [FromQuery] string source = "nubank", IFormFile? file = null)
     {
         if (file == null || file.Length == 0)
             return BadRequest(new { message = "Arquivo não fornecido" });
@@ -53,7 +54,8 @@ public class InvoiceController(
     }
 
     [HttpGet("key/{invoiceKey}/transactions-by-category")]
-    public async Task<ActionResult<List<TransactionsByCategoryResponse>>> GetTransactionsByCategory(string invoiceKey, [FromQuery] string? category = null)
+    public async Task<ActionResult<List<TransactionsByCategoryResponse>>> GetTransactionsByCategory(string invoiceKey,
+        [FromQuery] string? category = null)
     {
         var result = await invoiceService.GetTransactionsByCategoryAsync(invoiceKey, category);
 
@@ -62,5 +64,4 @@ public class InvoiceController(
 
         return Ok(result);
     }
-
 }

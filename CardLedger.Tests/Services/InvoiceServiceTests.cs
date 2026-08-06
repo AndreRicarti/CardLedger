@@ -99,6 +99,74 @@ public sealed class InvoiceServiceTests : IDisposable
         _context.Transactions.Should().HaveCount(1);
     }
 
+    [Fact]
+    public async Task ImportTransactionsAsync_ParcelaComDescricaoNoMesAnterior_HerdaDescricao()
+    {
+        // Arrange
+        await SeedTransactionsAsync([
+            BuildTransaction("2026-05", "Pag*Steam - Parcela 1/2 (Jogo)", 26.83m)
+        ]);
+
+        var novaParcela = BuildTransaction("2026-06", "Pag*Steam - Parcela 2/2", 26.83m);
+
+        // Act
+        await _sut.ImportTransactionsAsync([novaParcela]);
+
+        // Assert
+        var imported = await _context.Transactions.FirstAsync(t => t.InvoiceKey == "2026-06");
+        imported.Title.Should().Be("Pag*Steam - Parcela 2/2 (Jogo)");
+    }
+
+    [Fact]
+    public async Task ImportTransactionsAsync_ParcelaSemCorrespondenteNoMesAnterior_MantemTituloOriginal()
+    {
+        // Arrange
+        var novaParcela = BuildTransaction("2026-06", "Pag*Steam - Parcela 2/2", 26.83m);
+
+        // Act
+        await _sut.ImportTransactionsAsync([novaParcela]);
+
+        // Assert
+        var imported = await _context.Transactions.FirstAsync(t => t.InvoiceKey == "2026-06");
+        imported.Title.Should().Be("Pag*Steam - Parcela 2/2");
+    }
+
+    [Fact]
+    public async Task ImportTransactionsAsync_PrimeiraParcela_NaoBuscaMesAnterior()
+    {
+        // Arrange
+        await SeedTransactionsAsync([
+            BuildTransaction("2026-05", "Pag*Steam - Parcela 1/2 (Jogo)", 26.83m)
+        ]);
+
+        var novaParcela = BuildTransaction("2026-06", "Pag*Steam - Parcela 1/3", 10m);
+
+        // Act
+        await _sut.ImportTransactionsAsync([novaParcela]);
+
+        // Assert
+        var imported = await _context.Transactions.FirstAsync(t => t.InvoiceKey == "2026-06");
+        imported.Title.Should().Be("Pag*Steam - Parcela 1/3");
+    }
+
+    [Fact]
+    public async Task ImportTransactionsAsync_TituloJaComDescricao_NaoSobrescreve()
+    {
+        // Arrange
+        await SeedTransactionsAsync([
+            BuildTransaction("2026-05", "Pag*Steam - Parcela 1/2 (Jogo)", 26.83m)
+        ]);
+
+        var novaParcela = BuildTransaction("2026-06", "Pag*Steam - Parcela 2/2 (Outro)", 26.83m);
+
+        // Act
+        await _sut.ImportTransactionsAsync([novaParcela]);
+
+        // Assert
+        var imported = await _context.Transactions.FirstAsync(t => t.InvoiceKey == "2026-06");
+        imported.Title.Should().Be("Pag*Steam - Parcela 2/2 (Outro)");
+    }
+
     private Transaction BuildTransaction(
         string invoiceKey,
         string title,

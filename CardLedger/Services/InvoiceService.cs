@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using CardLedger.Data;
 using CardLedger.Models;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,10 @@ public interface IInvoiceService
 
 public sealed class InvoiceService(InvoiceDbContext context) : IInvoiceService
 {
+    private static readonly Regex InstallmentTitleRegex = new(
+        @"^(?<base>.+?)\s*-\s*Parcela\s+(?<atual>\d+)\s*/\s*(?<total>\d+)\s*(\((?<desc>.+)\))?\s*$",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
     public async Task<InvoiceSummary?> GetInvoiceSummaryByKeyAsync(string invoiceKey)
     {
         var transactions = await context.Transactions
@@ -108,6 +113,8 @@ public sealed class InvoiceService(InvoiceDbContext context) : IInvoiceService
             }
         }
 
+        await EnrichInstallmentTitlesAsync(transactions);
+
         var invoiceKeys = transactions
             .Where(t => !string.IsNullOrEmpty(t.InvoiceKey))
             .Select(t => t.InvoiceKey!)
@@ -130,4 +137,67 @@ public sealed class InvoiceService(InvoiceDbContext context) : IInvoiceService
         return transactions.Count;
     }
 
+    private async Task EnrichInstallmentTitlesAsync(List<Transaction> transactions)
+    {
+        var candidates = transactions
+            .Select(t => (Transaction: t, Match: InstallmentTitleRegex.Match(t.Title ?? string.Empty)))
+            .Where(x => x.Match.Success
+                && !x.Match.Groups["desc"].Success
+                && int.Parse(x.Match.Groups["atual"].Value) > 1)
+            .Select(x => (x.Transaction, x.Match, PreviousKey: GetPreviousInvoiceKey(x.Transaction.InvoiceKey)))
+            .Where(x => !string.IsNullOrEmpty(x.PreviousKey))
+            .ToList();
+
+        if (candidates.Count == 0)
+            return;
+
+        var previousKeys = candidates.Select(x => x.PreviousKey!).Distinct().ToList();
+
+        var previousTitles = await context.Transactions
+            .Where(t => previousKeys.Contains(t.InvoiceKey!))
+            .Select(t => new { t.InvoiceKey, t.Title })
+            .ToListAsync();
+
+        foreach (var (transaction, match, previousKey) in candidates)
+        {
+            var baseTitle = match.Groups["base"].Value.Trim();
+            var atual = int.Parse(match.Groups["atual"].Value);
+            var total = int.Parse(match.Groups["total"].Value);
+            var previousAtual = atual - 1;
+
+            Match? previousMatch = null;
+            foreach (var previous in previousTitles.Where(p => p.InvoiceKey == previousKey))
+            {
+                var candidateMatch = InstallmentTitleRegex.Match(previous.Title ?? string.Empty);
+                if (candidateMatch.Success
+                    && candidateMatch.Groups["desc"].Success
+                    && int.Parse(candidateMatch.Groups["total"].Value) == total
+                    && int.Parse(candidateMatch.Groups["atual"].Value) == previousAtual
+                    && string.Equals(candidateMatch.Groups["base"].Value.Trim(), baseTitle, StringComparison.OrdinalIgnoreCase))
+                {
+                    previousMatch = candidateMatch;
+                    break;
+                }
+            }
+
+            if (previousMatch is null)
+                continue;
+
+            var desc = previousMatch.Groups["desc"].Value.Trim();
+            transaction.Title = $"{baseTitle} - Parcela {atual}/{total} ({desc})";
+        }
+    }
+
+    private static string? GetPreviousInvoiceKey(string? invoiceKey)
+    {
+        if (string.IsNullOrWhiteSpace(invoiceKey))
+            return null;
+
+        var parts = invoiceKey.Split('-');
+        if (parts.Length != 2 || !int.TryParse(parts[0], out var year) || !int.TryParse(parts[1], out var month))
+            return null;
+
+        var previous = new DateOnly(year, month, 1).AddMonths(-1);
+        return $"{previous.Year}-{previous.Month:D2}";
+    }
 }

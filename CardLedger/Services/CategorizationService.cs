@@ -61,7 +61,8 @@ public sealed class CategorizationService : ICategorizationService
 
             new KeywordCategoryRule("Compras Avulsas",
             [
-                ("aliexpress", 10), ("compra avulsa", 10), ("compras avulsas", 10)
+                ("aliexpress", 10), ("compra avulsa", 10), ("compras avulsas", 10),
+                ("cinemark tambore", 11)
             ]),
 
             new KeywordCategoryRule("Compras Online",
@@ -80,6 +81,7 @@ public sealed class CategorizationService : ICategorizationService
             [
                 ("55.769.239 ana paula r", 11), ("jw lima", 11),
                 ("pao de acucar", 11), ("pão de açúcar", 11),
+                ("divino fogao", 11), ("divino fogão", 11),
                 ("restaurante", 10), ("restaur", 10), ("pizzaria", 10),
                 ("hamburgueria", 10), ("churrascaria", 10),
                 ("cantina", 9), ("boteco", 9), ("bar", 8), ("pastel", 10),

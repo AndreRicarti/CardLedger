@@ -23,6 +23,7 @@ public sealed class CategorizationServiceTests
     [InlineData("compra avulsa marketplace", "Compras Avulsas")]
     [InlineData("Aliexpress", "Compras Avulsas")]
     [InlineData("ALIEXPRESS*Produto123", "Compras Avulsas")]
+    [InlineData("Cinemark Tambore", "Compras Avulsas")]
     [InlineData("pagamento terceiros", "Terceiros")]
     [InlineData("posto de gasolina", "Transporte")]
     [InlineData("youtube premium", "Assinaturas & Contas")]
@@ -77,6 +78,7 @@ public sealed class CategorizationServiceTests
     [InlineData("Ifd*Pastel do Vini", "Alimentação")]
     [InlineData("Pao de Acucar", "Alimentação")]
     [InlineData("Pão de Açúcar Unidade 12", "Alimentação")]
+    [InlineData("Divino Fogao-Comida", "Alimentação")]
     public void CategorizeTransaction_TituloConhecido_RetornaCategoriaCerta(string title, string expectedCategory)
     {
         // Act

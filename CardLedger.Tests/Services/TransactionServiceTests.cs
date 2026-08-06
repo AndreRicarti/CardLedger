@@ -93,6 +93,48 @@ public sealed class TransactionServiceTests : IDisposable
         success.Should().BeFalse();
     }
 
+    [Fact]
+    public async Task UpdateTitleAsync_IdEInvoiceKeyExistentes_AtualizaTituloERetornaTrue()
+    {
+        // Arrange
+        var transaction = BuildTransaction(2024, 3, "Alimentação");
+        _context.Transactions.Add(transaction);
+        await _context.SaveChangesAsync();
+
+        // Act
+        var success = await _sut.UpdateTitleAsync(transaction.InvoiceKey, transaction.Id, "Novo Titulo");
+
+        // Assert
+        success.Should().BeTrue();
+        var updated = await _context.Transactions.FirstAsync(t => t.Id == transaction.Id);
+        updated.Title.Should().Be("Novo Titulo");
+    }
+
+    [Fact]
+    public async Task UpdateTitleAsync_InvoiceKeyNaoCorrespondeAoId_RetornaFalse()
+    {
+        // Arrange
+        var transaction = BuildTransaction(2024, 3, "Alimentação");
+        _context.Transactions.Add(transaction);
+        await _context.SaveChangesAsync();
+
+        // Act
+        var success = await _sut.UpdateTitleAsync("2099-01", transaction.Id, "Novo Titulo");
+
+        // Assert
+        success.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task UpdateTitleAsync_IdInexistente_RetornaFalse()
+    {
+        // Act
+        var success = await _sut.UpdateTitleAsync("2024-03", 9999, "Novo Titulo");
+
+        // Assert
+        success.Should().BeFalse();
+    }
+
     private Transaction BuildTransaction(int year, int month, string category)
     {
         var categoryId = _context.Categories

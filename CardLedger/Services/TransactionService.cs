@@ -7,6 +7,7 @@ namespace CardLedger.Services;
 public interface ITransactionService
 {
     Task<bool> UpdateCategoryAsync(int id, int categoryId);
+    Task<bool> UpdateTitleAsync(string invoiceKey, int id, string title);
     Task<bool> DeleteByInvoiceKeyAsync(string invoiceKey);
     Task<List<CategoryOption>> GetCategoriesAsync();
 }
@@ -31,6 +32,19 @@ public sealed class TransactionService : ITransactionService
             return false;
 
         transaction.CategoryId = categoryId;
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> UpdateTitleAsync(string invoiceKey, int id, string title)
+    {
+        var transaction = await _context.Transactions
+            .FirstOrDefaultAsync(t => t.Id == id && t.InvoiceKey == invoiceKey);
+
+        if (transaction == null)
+            return false;
+
+        transaction.Title = title;
         await _context.SaveChangesAsync();
         return true;
     }

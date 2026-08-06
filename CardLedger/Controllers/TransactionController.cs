@@ -39,4 +39,20 @@ public class TransactionController(ITransactionService transactionService) : Con
             ? Ok(new { message = "Categoria atualizada com sucesso" })
             : NotFound(new { message = "Transação ou categoria não encontrada" });
     }
+
+    [HttpPatch("{invoiceKey}/{id:int}/title")]
+    public async Task<IActionResult> UpdateTitle(
+        string invoiceKey,
+        int id,
+        [FromBody] UpdateTitleRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Title))
+            return BadRequest(new { message = "Title inválido" });
+
+        var updated = await transactionService.UpdateTitleAsync(invoiceKey, id, request.Title.Trim());
+
+        return updated
+            ? Ok(new { message = "Título atualizado com sucesso" })
+            : NotFound(new { message = "Transação não encontrada para este InvoiceKey" });
+    }
 }

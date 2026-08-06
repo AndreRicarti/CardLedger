@@ -33,7 +33,7 @@ public sealed class CategorizationService : ICategorizationService
 
             new KeywordCategoryRule("Carro",
             [
-                ("park car one", 11), ("zona azul barueri", 11), ("nutag", 11),
+                ("park car one", 11), ("zona azul barueri", 11), ("zonaazulbarueri", 11), ("nutag", 11),
                 ("shellbox", 11), ("rei tupa", 11)
             ]),
 
@@ -44,7 +44,7 @@ public sealed class CategorizationService : ICategorizationService
 
             new KeywordCategoryRule("Mayara",
             [
-                ("shopee", 10)
+                ("shopee", 10), ("shein *shein.com", 11)
             ]),
 
             new KeywordCategoryRule("Assinaturas & Contas",
@@ -53,10 +53,11 @@ public sealed class CategorizationService : ICategorizationService
                 ("enel", 11), ("enelsp", 11), ("flexpag", 11), ("fmu", 11),
                 ("sabesp", 11), ("melimais", 11), ("alares", 11),
                 ("youtubepremium", 11), ("youtube", 10), ("netflix", 10),
-                ("spotify", 10), ("amazon prime", 10), ("disney+", 10),
-                ("hbo", 10), ("globoplay", 10), ("paramount", 10),
+                ("spotify", 10), ("amazon prime", 10), ("amazonprimebr", 11), ("disney+", 10),
+                ("hbo", 10), ("globoplay", 10), ("paramount", 10), ("locaweb", 11),
                 ("apple tv", 10), ("crunchyroll", 10), ("google one", 10),
-                ("google storage", 10), ("premium", 7), ("subscription", 8), ("plano", 6)
+                ("google storage", 10), ("premium", 7), ("subscription", 8), ("plano", 6),
+                ("anthropic", 11)
             ]),
 
             new KeywordCategoryRule("Compras Avulsas",
